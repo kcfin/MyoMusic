@@ -7,6 +7,10 @@
 //
 
 #import "AppDelegate.h"
+#import "Config.h"
+#import "LoginViewController.h"
+#import "ProfileViewController.h"
+#import "SpotifyUser.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +21,33 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    [self.window makeKeyAndVisible];
+    ProfileViewController *profileVC = [ProfileViewController new];
+    [SpotifyUser user].profileVC = profileVC;
+    UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:profileVC];
+    [self.window setRootViewController:navVC];
+    [navVC setNavigationBarHidden:NO];
+    
+    SPTAuth *auth = [SPTAuth defaultInstance];
+    auth.clientID = @kClientId;
+    auth.requestedScopes = @[SPTAuthStreamingScope, SPTAuthPlaylistReadPrivateScope,
+                             SPTAuthUserReadPrivateScope, SPTAuthUserLibraryReadScope];
+    auth.redirectURL = [NSURL URLWithString:@kCallbackURL];
+#ifdef kTokenSwapServiceURL
+    auth.tokenSwapURL = [NSURL URLWithString:@kTokenSwapServiceURL];
+#endif
+#ifdef kTokenRefreshServiceURL
+    auth.tokenRefreshURL = [NSURL URLWithString:@kTokenRefreshServiceURL];
+#endif
+    auth.sessionUserDefaultsKey = @kSessionUserDefaultsKey;
+    
+    if(auth.session == nil || ![auth.session isValid]) {
+        [navVC pushViewController:[LoginViewController new] animated:YES];
+    } else {
+        [[SpotifyUser user] handle:auth.session];
+    }
+    
     return YES;
 }
 
