@@ -23,6 +23,9 @@ static SpotifyUser *userInst = nil;
 }
 
 -(void)handle:(SPTSession *)session {
+    if(session){
+        _session = session;
+    }
     [SPTRequest userInformationForUserInSession:session callback:^(NSError *error, id object) {
         if (!error) {
             self.sptUser = object;

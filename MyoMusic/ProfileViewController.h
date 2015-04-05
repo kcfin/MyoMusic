@@ -11,6 +11,8 @@
 
 @interface ProfileViewController : UIViewController
 
+@property(nonatomic) NSMutableArray* playlists;
+
 -(void)reload;
 
 @end

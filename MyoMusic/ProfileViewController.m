@@ -19,6 +19,9 @@
 @property (nonatomic) UILabel *nameLabel;
 @property (nonatomic, weak) SpotifyUser *user;
 
+-(void)fetchPlaylistPageForSession:(SPTSession *)session error:(NSError *)error object:(id)object;
+
+
 @end
 
 @implementation ProfileViewController
@@ -35,44 +38,88 @@
     
     self.userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-self.tableView.frame.size.height)];
     [self.view addSubview:self.userView];
-    self.userView.backgroundColor = [UIColor greenColor];
-    
+    self.userView.backgroundColor = [UIColor whiteColor];
+
     self.user = [SpotifyUser user];
+    self.playlists = [NSMutableArray new];
     [self loadProfilePicture];
 }
 
 -(void)reload {
+    NSLog(@"RELOADING PROFILE INFO W/ USER: %@", self.user.sptUser.displayName);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
+    self.nameLabel.text = self.user.sptUser.displayName;
+    [SPTRequest playlistsForUserInSession:self.user.session callback:^(NSError *error, id object) {
+        [self fetchPlaylistPageForSession:self.user.session error:error object:object];
+    }];
     
+}
+
+-(void)fetchPlaylistPageForSession:(SPTSession *)session error:(NSError *)error object:(id)object{
+    if (error != nil) {
+        NSLog(@"PLAYLIST ERROR");
+        abort();
+    } else {
+        if ([object isKindOfClass:[SPTPlaylistList class]]) {
+            SPTPlaylistList *playlistList = (SPTPlaylistList *)object;
+            
+            for (SPTPartialPlaylist *playlist in playlistList.items) {
+                NSLog(@"GOT PLAYLIST");
+                [self.playlists addObject:playlist];
+            }
+            
+            if (playlistList.hasNextPage) {
+                NSLog(@"GETTING NEXT PAGE");
+                [playlistList requestNextPageWithSession:session callback:^(NSError *error, id object) {
+                    [self fetchPlaylistPageForSession:session error:error object:object];
+                }];
+            }
+            
+            [self.tableView reloadData];
+        }
+    }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationController.navigationBarHidden = NO;
     // Do any additional setup after loading the view.
 }
 
 -(void)loadProfilePicture {
     self.profileImageView = [UIImageView new];
+    NSLog(@"PROFILE PIC URL: %@", self.user.sptUser.largestImage.imageURL);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
     self.profileImageView.layer.cornerRadius = self.userView.frame.size.width/6;
     self.profileImageView.layer.masksToBounds = YES;
     self.profileImageView.frame = CGRectMake(0, 0, self.userView.frame.size.width/3, self.userView.frame.size.width/3);
     self.profileImageView.center = self.userView.center;
-    self.profileImageView.backgroundColor = [UIColor blueColor];
+    self.profileImageView.backgroundColor = [UIColor whiteColor];
     [self.userView addSubview:self.profileImageView];
+    
+    self.nameLabel = [UILabel new];
+    self.nameLabel.frame = CGRectMake(0, self.profileImageView.frame.origin.y + self.profileImageView.frame.size.height, self.userView.frame.size.width, 50);
+    [self.nameLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.nameLabel setTextColor:[UIColor blackColor]];
+    if(self.user.sptUser.displayName){
+        NSLog(@"SETTING DISPLAY NAME");
+        self.nameLabel.text = [[NSString alloc] initWithString:self.user.sptUser.displayName];
+    }
+    [self.userView addSubview:self.nameLabel];
     
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     BasicCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     [cell setBackgroundColor:[UIColor redColor]];
-    [cell.textLabel setText:@"Fuck!"];
-    [cell.detailTextLabel setText:@"you!"];
+    SPTPartialPlaylist *playlistTemp = [self.playlists objectAtIndex:indexPath.row];
+    NSString *playlistName = playlistTemp.name;
+    [cell.textLabel setText:playlistName];
     return cell;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 5;
+    return self.playlists.count;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

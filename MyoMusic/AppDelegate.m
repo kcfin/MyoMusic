@@ -27,7 +27,10 @@
     [SpotifyUser user].profileVC = profileVC;
     UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:profileVC];
     [self.window setRootViewController:navVC];
-    [navVC setNavigationBarHidden:NO];
+    [navVC setNavigationBarHidden:YES];
+    [navVC.navigationBar.topItem setTitle:@"MyoMusic"];
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
+    [navVC.navigationItem setBackBarButtonItem:backButton];
     
     SPTAuth *auth = [SPTAuth defaultInstance];
     auth.clientID = @kClientId;
@@ -43,7 +46,7 @@
     auth.sessionUserDefaultsKey = @kSessionUserDefaultsKey;
     
     if(auth.session == nil || ![auth.session isValid]) {
-        [navVC pushViewController:[LoginViewController new] animated:YES];
+        [navVC pushViewController:[LoginViewController new] animated:NO];
     } else {
         [[SpotifyUser user] handle:auth.session];
     }

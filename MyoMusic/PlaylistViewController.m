@@ -17,6 +17,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    UILabel *testView = [UILabel new];
+    [testView setFrame:CGRectMake(60, 200, 200, 50)];
+    [testView setText:@"TEST"];
+    [testView setTextColor:[UIColor whiteColor]];
+    [self.view addSubview:testView];
 }
 
 - (void)didReceiveMemoryWarning {
