@@ -8,6 +8,7 @@
 
 #import "ProfileViewController.h"
 #import "PlaylistViewController.h"
+#import "MusicPlayerViewController.h"
 #import "BasicCell.h"
 #import "SpotifyUser.h"
 
@@ -18,6 +19,7 @@
 @property (nonatomic) UIImageView *profileImageView;
 @property (nonatomic) UILabel *nameLabel;
 @property (nonatomic, weak) SpotifyUser *user;
+@property (nonatomic) MusicPlayerViewController *musicVC;
 
 -(void)fetchPlaylistPageForSession:(SPTSession *)session error:(NSError *)error object:(id)object;
 
@@ -42,6 +44,9 @@
 
     self.user = [SpotifyUser user];
     self.playlists = [NSMutableArray new];
+    
+    self.musicVC = [MusicPlayerViewController new];
+    [self.navigationController.navigationBar.topItem setTitle:@"Home"];
     [self loadProfilePicture];
 }
 
@@ -127,8 +132,10 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    PlaylistViewController *playlistVC = [PlaylistViewController new];
-    [self.navigationController pushViewController:playlistVC animated:YES];
+    //PlaylistViewController *playlistVC = [PlaylistViewController new];
+    self.musicVC.session = self.user.session;
+    [self.musicVC setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)[self.playlists objectAtIndex:indexPath.row]];
+    [self.navigationController pushViewController:self.musicVC animated:YES];
 }
 
 @end

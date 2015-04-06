@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Spotify/Spotify.h>
 
-@interface MusicPlayerViewController : UIViewController
+@interface MusicPlayerViewController : UIViewController <SPTAudioStreamingDelegate, SPTAudioStreamingPlaybackDelegate>
+
+@property(nonatomic)SPTSession *session;
+
+-(void)setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)partialPlaylist;
+
 
 @end
