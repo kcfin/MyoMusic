@@ -31,13 +31,21 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    self.view.backgroundColor = [UIColor darkGrayColor];
+    self.view.backgroundColor = [UIColor lightGrayColor];
     [self initButton];
     
 }
 
 
 - (void)viewWillAppear:(BOOL)animated {
+    
+//    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
+//    [self.navigationItem setBackBarButtonItem:backButton];
+//    [self.navigationItem setLeftBarButtonItem:backButton];
+//    [self.navigationItem setHidesBackButton:YES];
+//    [self.navigationItem setTitle:@"MyoMusic"];
+    self.navigationController.navigationBarHidden = NO;
+    
     SPTAuth *auth = [SPTAuth defaultInstance];
     
     if (auth.hasTokenRefreshService) {
@@ -65,11 +73,21 @@
 
 -(void)initButton {
     self.loginButton = [UIButton new];
-    self.loginButton.backgroundColor = [UIColor greenColor];
-    [self.loginButton setFrame:CGRectMake(50, 200, 250, 50)];
-    [self.loginButton setTitle:@"Log In To Spotify" forState:UIControlStateNormal];
-    
+    self.loginButton.backgroundColor = [UIColor whiteColor];
+    [self.loginButton setTitle:@"Log In With Spotify" forState:UIControlStateNormal];
+    [self.loginButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.loginButton.layer setBorderWidth:0.5f];
+    [self.loginButton.layer setCornerRadius:3.0f];
+    [self.loginButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self.view addSubview:self.loginButton];
+
+    UIView *login = self.loginButton;
+    NSDictionary *loginView = NSDictionaryOfVariableBindings(login);
+    
+    NSArray *loginConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[login]-|" options:0 metrics:nil views:loginView];
+    loginConstraints = [loginConstraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[login(50)]-150-|" options:0 metrics:nil views:loginView]];
+    
+    [self.view addConstraints:loginConstraints];
     [self.loginButton addTarget:self action:@selector(loginTapped) forControlEvents:UIControlEventTouchUpInside];
     
 }
@@ -78,6 +96,8 @@
     
     self.authViewController = [SPTAuthViewController authenticationViewController];
     self.authViewController.delegate = self;
+//    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
+//    [self.authViewController.navigationItem setBackBarButtonItem:backButton];
     self.authViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     self.authViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     

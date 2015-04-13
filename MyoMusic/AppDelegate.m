@@ -23,11 +23,19 @@
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     [self.window makeKeyAndVisible];
+    
     ProfileViewController *profileVC = [ProfileViewController new];
+    
     [SpotifyUser user].profileVC = profileVC;
+    
     UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:profileVC];
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
+    
     [self.window setRootViewController:navVC];
-    [navVC setNavigationBarHidden:NO];
+    
+    [navVC setNavigationBarHidden:YES];
+    [navVC.navigationBar.topItem setTitle:@"MyoMusic"];
+    [navVC.navigationItem setBackBarButtonItem:backButton];
     
     SPTAuth *auth = [SPTAuth defaultInstance];
     auth.clientID = @kClientId;
@@ -43,7 +51,7 @@
     auth.sessionUserDefaultsKey = @kSessionUserDefaultsKey;
     
     if(auth.session == nil || ![auth.session isValid]) {
-        [navVC pushViewController:[LoginViewController new] animated:YES];
+        [navVC pushViewController:[LoginViewController new] animated:NO];
     } else {
         [[SpotifyUser user] handle:auth.session];
     }

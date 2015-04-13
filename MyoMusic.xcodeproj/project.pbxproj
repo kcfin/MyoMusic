@@ -20,6 +20,7 @@
 		BFEA5D581AC8C7D600C05DB6 /* MyoMusicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BFEA5D571AC8C7D600C05DB6 /* MyoMusicTests.m */; };
 		BFEA5D641AC8C86600C05DB6 /* Spotify.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFEA5D631AC8C86500C05DB6 /* Spotify.framework */; };
 		BFEA5D661AC8C87200C05DB6 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFEA5D651AC8C87200C05DB6 /* AVFoundation.framework */; };
+		FA579E3A1AD1FCB90020F90F /* MusicPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FA579E391AD1FCB90020F90F /* MusicPlayerViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,8 @@
 		BFEA5D571AC8C7D600C05DB6 /* MyoMusicTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyoMusicTests.m; sourceTree = "<group>"; };
 		BFEA5D631AC8C86500C05DB6 /* Spotify.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Spotify.framework; sourceTree = "<group>"; };
 		BFEA5D651AC8C87200C05DB6 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		FA579E381AD1FCB90020F90F /* MusicPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicPlayerViewController.h; sourceTree = "<group>"; };
+		FA579E391AD1FCB90020F90F /* MusicPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicPlayerViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +124,8 @@
 				BF4CD9951AC8CB9E00211ED9 /* BasicCell.m */,
 				BF4CD9971AC8CBBF00211ED9 /* PlaylistViewController.h */,
 				BF4CD9981AC8CBBF00211ED9 /* PlaylistViewController.m */,
+				FA579E381AD1FCB90020F90F /* MusicPlayerViewController.h */,
+				FA579E391AD1FCB90020F90F /* MusicPlayerViewController.m */,
 				BF4CD99A1AC8CBF900211ED9 /* LoginViewController.h */,
 				BF4CD99B1AC8CBF900211ED9 /* LoginViewController.m */,
 				BF4CD9901AC8CB5300211ED9 /* Storyboard */,
@@ -268,6 +273,7 @@
 				BF4CD99C1AC8CBF900211ED9 /* LoginViewController.m in Sources */,
 				BF4CD98F1AC8CACF00211ED9 /* SpotifyUser.m in Sources */,
 				BF4CD9991AC8CBBF00211ED9 /* PlaylistViewController.m in Sources */,
+				FA579E3A1AD1FCB90020F90F /* MusicPlayerViewController.m in Sources */,
 				BF4CD9961AC8CB9E00211ED9 /* BasicCell.m in Sources */,
 				BFEA5D411AC8C7D600C05DB6 /* AppDelegate.m in Sources */,
 				BFEA5D3E1AC8C7D600C05DB6 /* main.m in Sources */,
@@ -403,6 +409,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -418,6 +425,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

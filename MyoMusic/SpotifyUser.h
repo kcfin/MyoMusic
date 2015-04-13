@@ -17,5 +17,6 @@
 
 @property (nonatomic) SPTUser *sptUser;
 @property (nonatomic, weak) ProfileViewController *profileVC;
+@property (nonatomic) SPTSession *session;
 
 @end
