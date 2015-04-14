@@ -14,7 +14,6 @@
 
 @interface ProfileViewController () <UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic) UIScrollView *scrollView;
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) UIView *userView;
 @property (nonatomic) UIImageView *profileImageView;
@@ -25,7 +24,6 @@
 
 
 -(void)fetchPlaylistPageForSession:(SPTSession *)session error:(NSError *)error object:(id)object;
-
 
 @end
 
@@ -45,16 +43,16 @@
     [self.tableView setDataSource:self];
     [self.tableView setBackgroundColor:[UIColor blackColor]];
     self.tableView.tableHeaderView = nil;
+    self.tableView.rowHeight = self.tableView.frame.size.height/6;
+    self.tableView.scrollEnabled = NO;
     
     self.userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-self.tableView.frame.size.height)];
     [self.view addSubview:self.userView];
-    self.userView.backgroundColor = [UIColor whiteColor];
+    self.userView.backgroundColor = [UIColor darkGrayColor];
+    [self loadProfile];
 
     self.user = [SpotifyUser user];
     self.playlists = [NSMutableArray new];
-    
-    self.user = [SpotifyUser user];
-    self.musicVC = [MusicPlayerViewController new];
     [self.navigationController.navigationBar.topItem setTitle:@"Home"];
 }
 
@@ -81,7 +79,7 @@
                 NSLog(@"GOT PLAYLIST");
                 [self.playlists addObject:playlist];
             }
-            
+                        
             if (playlistList.hasNextPage) {
                 NSLog(@"GETTING NEXT PAGE");
                 [playlistList requestNextPageWithSession:session callback:^(NSError *error, id object) {
@@ -100,23 +98,7 @@
     // Do any additional setup after loading the view.
 }
 
-- (void)loadScrollView {
-    self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
-    self.scrollView.alwaysBounceVertical = YES;
-    self.scrollView.delaysContentTouches = NO;
-    self.scrollView.backgroundColor = [UIColor darkGrayColor];
-//    [self.view addSubview:self.scrollView];
-}
-
--(void)loadLabel {
-    self.nameLabel = [UILabel new];
-    self.nameLabel.font = [UIFont fontWithName:@"Avenir-Heavy" size:[UIFont systemFontSize] * 2];
-    self.nameLabel.textColor = [UIColor whiteColor];
-    self.nameLabel.frame = CGRectMake(self.view.center.x, 100, self.nameLabel.frame.size.width, self.nameLabel.frame.size.height);
-    [self.userView addSubview:self.nameLabel];
-}
-
--(void)loadProfilePicture {
+-(void)loadProfile {
     self.profileImageView = [UIImageView new];
     NSLog(@"PROFILE PIC URL: %@", self.user.sptUser.largestImage.imageURL);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
@@ -129,8 +111,9 @@
     
     self.nameLabel = [UILabel new];
     self.nameLabel.frame = CGRectMake(0, self.profileImageView.frame.origin.y + self.profileImageView.frame.size.height, self.userView.frame.size.width, 50);
+    self.nameLabel.font = [UIFont fontWithName:@"Avenir-Heavy" size:[UIFont systemFontSize] *2];
     [self.nameLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.nameLabel setTextColor:[UIColor blackColor]];
+    [self.nameLabel setTextColor:[UIColor whiteColor]];
     if(self.user.sptUser.displayName){
         NSLog(@"SETTING DISPLAY NAME");
         self.nameLabel.text = [[NSString alloc] initWithString:self.user.sptUser.displayName];
@@ -140,42 +123,65 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    BasicCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-    NSString *playlistName;
-    SPTPartialPlaylist *playlistTemp = [self.playlists objectAtIndex:indexPath.row];
-    playlistName = playlistTemp.name;
-    [cell.textLabel setText:playlistName];
     
-    if(cell.isSelected){
-        [cell setBackgroundColor:[UIColor darkGrayColor]];
-        [cell.textLabel setTextColor:[UIColor whiteColor]];
-    }else{
-        [cell setBackgroundColor:[UIColor blackColor]];
-        [cell.textLabel setTextColor:[UIColor whiteColor]];
+    BasicCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    [cell.textLabel setTextColor:[UIColor whiteColor]];
+    
+    switch (indexPath.row) {
+        case 0:
+            [cell.textLabel setText:@"Playlists"];
+            break;
+        case 1:
+            [cell.textLabel setText:@"Songs"];
+            break;
+        case 2:
+            [cell.textLabel setText:@"Artists"];
+            break;
+        case 3:
+            [cell.textLabel setText:@"Albums"];
+            break;
+        case 4:
+            [cell.textLabel setText:@"Myo Playlists"];
+            break;
+        default:
+            break;
     }
+    
+    if(cell.isSelected) {
+        [cell setBackgroundColor:[UIColor darkGrayColor]];
+    } else {
+        [cell setBackgroundColor:[UIColor blackColor]];
+    }
+    
     return cell;
+    
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.playlists.count;
+    return 5;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
+
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
-    NSString *title = @"Playlists";
+    NSString *title = @"Music";
     return title;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(self.currentPlayingIndex != indexPath.row){
-        self.currentPlayingIndex = indexPath.row;
-        self.musicVC.session = self.user.session;
-        [self.musicVC setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)[self.playlists objectAtIndex:indexPath.row]];
-    }
     
-    [self.navigationController pushViewController:self.musicVC animated:YES];
+    switch (indexPath.row) {
+        case 0: {
+            PlaylistViewController *pvc = [PlaylistViewController new];
+            [self.navigationController pushViewController:pvc animated:YES];
+            pvc.playlists = self.playlists;
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 @end

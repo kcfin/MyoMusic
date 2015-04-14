@@ -10,4 +10,6 @@
 
 @interface PlaylistViewController : UIViewController
 
+@property (nonatomic) NSMutableArray* playlists;
+
 @end

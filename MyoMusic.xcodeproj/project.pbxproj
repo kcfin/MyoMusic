@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BF2709F11ADD91EC00F01D07 /* AlbumViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF2709F01ADD91EC00F01D07 /* AlbumViewController.m */; };
 		BF4CD98F1AC8CACF00211ED9 /* SpotifyUser.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD98E1AC8CACF00211ED9 /* SpotifyUser.m */; };
 		BF4CD9931AC8CB6F00211ED9 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD9921AC8CB6F00211ED9 /* ProfileViewController.m */; };
 		BF4CD9961AC8CB9E00211ED9 /* BasicCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD9951AC8CB9E00211ED9 /* BasicCell.m */; };
@@ -34,6 +35,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BF2709EF1ADD91EC00F01D07 /* AlbumViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumViewController.h; sourceTree = "<group>"; };
+		BF2709F01ADD91EC00F01D07 /* AlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumViewController.m; sourceTree = "<group>"; };
 		BF4CD98C1AC8CA7B00211ED9 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		BF4CD98D1AC8CACF00211ED9 /* SpotifyUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpotifyUser.h; sourceTree = "<group>"; };
 		BF4CD98E1AC8CACF00211ED9 /* SpotifyUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpotifyUser.m; sourceTree = "<group>"; };
@@ -124,6 +127,8 @@
 				BF4CD9951AC8CB9E00211ED9 /* BasicCell.m */,
 				BF4CD9971AC8CBBF00211ED9 /* PlaylistViewController.h */,
 				BF4CD9981AC8CBBF00211ED9 /* PlaylistViewController.m */,
+				BF2709EF1ADD91EC00F01D07 /* AlbumViewController.h */,
+				BF2709F01ADD91EC00F01D07 /* AlbumViewController.m */,
 				FA579E381AD1FCB90020F90F /* MusicPlayerViewController.h */,
 				FA579E391AD1FCB90020F90F /* MusicPlayerViewController.m */,
 				BF4CD99A1AC8CBF900211ED9 /* LoginViewController.h */,
@@ -272,6 +277,7 @@
 			files = (
 				BF4CD99C1AC8CBF900211ED9 /* LoginViewController.m in Sources */,
 				BF4CD98F1AC8CACF00211ED9 /* SpotifyUser.m in Sources */,
+				BF2709F11ADD91EC00F01D07 /* AlbumViewController.m in Sources */,
 				BF4CD9991AC8CBBF00211ED9 /* PlaylistViewController.m in Sources */,
 				FA579E3A1AD1FCB90020F90F /* MusicPlayerViewController.m in Sources */,
 				BF4CD9961AC8CB9E00211ED9 /* BasicCell.m in Sources */,
@@ -406,6 +412,7 @@
 					"$(PROJECT_DIR)/MyoMusic",
 				);
 				INFOPLIST_FILE = MyoMusic/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -422,6 +429,7 @@
 					"$(PROJECT_DIR)/MyoMusic",
 				);
 				INFOPLIST_FILE = MyoMusic/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
