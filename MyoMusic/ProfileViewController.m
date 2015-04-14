@@ -20,6 +20,7 @@
 @property (nonatomic) UILabel *nameLabel;
 @property (nonatomic, weak) SpotifyUser *user;
 @property (nonatomic) MusicPlayerViewController *musicVC;
+@property (nonatomic) PlaylistViewController *pvc;
 @property (nonatomic) NSInteger currentPlayingIndex;
 
 
@@ -53,6 +54,7 @@
 
     self.user = [SpotifyUser user];
     self.playlists = [NSMutableArray new];
+    self.pvc = [PlaylistViewController new];
     [self.navigationController.navigationBar.topItem setTitle:@"Home"];
 }
 
@@ -173,12 +175,10 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     switch (indexPath.row) {
-        case 0: {
-            PlaylistViewController *pvc = [PlaylistViewController new];
-            [self.navigationController pushViewController:pvc animated:YES];
-            pvc.playlists = self.playlists;
+        case 0:
+            [self.navigationController pushViewController:self.pvc animated:YES];
+            self.pvc.playlists = self.playlists;
             break;
-        }
         default:
             break;
     }
