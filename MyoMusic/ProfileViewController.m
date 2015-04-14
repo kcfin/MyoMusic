@@ -41,17 +41,25 @@
     
     self.userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-self.tableView.frame.size.height)];
     [self.view addSubview:self.userView];
-    self.userView.backgroundColor = [UIColor darkGrayColor];
+    self.userView.backgroundColor = [UIColor whiteColor];
+
+    self.user = [SpotifyUser user];
+    self.playlists = [NSMutableArray new];
     
     self.user = [SpotifyUser user];
-    [self loadLabel];
-    [self loadProfilePicture];
+    self.musicVC = [MusicPlayerViewController new];
+    [self.navigationController.navigationBar.topItem setTitle:@"Home"];
 }
 
+    
 -(void)reload {
     NSLog(@"RELOADING PROFILE INFO W/ USER: %@", self.user.sptUser.displayName);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
     self.nameLabel.text = self.user.sptUser.displayName;
+    [SPTRequest playlistsForUserInSession:self.user.session callback:^(NSError *error, id object) {
+        [self fetchPlaylistPageForSession:self.user.session error:error object:object];
+    }];
+    
 }
 
 -(void)fetchPlaylistPageForSession:(SPTSession *)session error:(NSError *)error object:(id)object{
@@ -109,6 +117,7 @@
     self.profileImageView.layer.masksToBounds = YES;
     self.profileImageView.frame = CGRectMake(0, 0, self.userView.frame.size.width/3, self.userView.frame.size.width/3);
     self.profileImageView.center = self.userView.center;
+    self.profileImageView.backgroundColor = [UIColor whiteColor];
     [self.userView addSubview:self.profileImageView];
     
     self.nameLabel = [UILabel new];
