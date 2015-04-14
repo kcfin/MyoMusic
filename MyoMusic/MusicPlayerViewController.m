@@ -21,6 +21,11 @@
 @property (nonatomic)UILabel *artistLabel;
 @property (nonatomic)UIImageView *coverArt;
 
+@property (nonatomic)UIButton *playButton;
+@property (nonatomic)UIButton *pauseButton;
+@property (nonatomic)UIButton *nextButton;
+@property (nonatomic)UIButton *prevButton;
+
 -(void)updateInfo;
 
 @end
@@ -33,27 +38,76 @@
     self.title = @"Now Playing";
     self.trackURIs = [NSMutableArray new];
     
+    self.playButton = [UIButton new];
+    [self.playButton addTarget:self action:@selector(togglePlaying:) forControlEvents:UIControlEventTouchUpInside];
+    [self.playButton setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
+    self.nextButton = [UIButton new];
+    [self.nextButton addTarget:self action:@selector(skipNext:) forControlEvents:UIControlEventTouchUpInside];
+    [self.nextButton setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
+    self.prevButton = [UIButton new];
+    [self.prevButton addTarget:self action:@selector(skipPrevious:) forControlEvents:UIControlEventTouchUpInside];
+    [self.prevButton setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
     self.trackLabel = [UILabel new];
-    [self.trackLabel setFrame:CGRectMake(50, 300, 250, 50)];
+    //[self.trackLabel setFrame:CGRectMake(50, 300, 250, 50)];
     [self.trackLabel setTextColor:[UIColor redColor]];
     [self.trackLabel setLineBreakMode:NSLineBreakByTruncatingTail];
     self.trackLabel.backgroundColor = [UIColor whiteColor];
     self.trackLabel.numberOfLines = 2;
     [self.trackLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.trackLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     self.artistLabel = [UILabel new];
-    [self.artistLabel setFrame:CGRectMake(100, 350, 200, 50)];
+    //[self.artistLabel setFrame:CGRectMake(100, 350, 200, 50)];
     self.artistLabel.backgroundColor = [UIColor whiteColor];
     [self.artistLabel setTextColor:[UIColor redColor]];
+    [self.artistLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     self.coverArt = [UIImageView new];
-    [self.coverArt setFrame:CGRectMake(50, 50, 200, 200)];
+    //[self.coverArt setFrame:CGRectMake(50, 50, 200, 200)];
+    [self.coverArt setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
+    [self.view setCenter:CGPointMake([UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2)];
+    
     [self.view addSubview:self.trackLabel];
     [self.view addSubview:self.artistLabel];
     [self.view addSubview:self.coverArt];
+    [self.view addSubview:self.playButton];
+    [self.view addSubview:self.pauseButton];
+    [self.view addSubview:self.nextButton];
+    [self.view addSubview:self.prevButton];
+
+    [self createConstraints];
     
+    [self.playButton setBackgroundColor:[UIColor whiteColor]];
     self.view.backgroundColor = [UIColor lightGrayColor];
     // Do any additional setup after loading the view.
+}
+
+-(void)createConstraints{
+    UIView *trackView = self.trackLabel;
+    UIView *artistView = self.artistLabel;
+    UIView *coverView = self.coverArt;
+    UIView *playView = self.playButton;
+    UIView *nextView = self.nextButton;
+    UIView *prevView = self.prevButton;
+    
+    NSDictionary *views = NSDictionaryOfVariableBindings(trackView, artistView, coverView, playView, nextView, prevView, self.view);
+    
+    NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:[coverView(<=200)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views];
+    
+    constraints = [constraints arrayByAddingObject:[NSLayoutConstraint constraintWithItem:self.coverArt attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0]];
+    
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-84-[coverView]-[trackView(50)]-10-[artistView(50)]-[playView(50)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+    
+    constraints = [constraints arrayByAddingObject:[NSLayoutConstraint constraintWithItem:self.playButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.playButton attribute:NSLayoutAttributeHeight multiplier:1.0 constant:0]];
+    
+    constraints = [constraints arrayByAddingObject:[NSLayoutConstraint constraintWithItem:self.coverArt attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.coverArt attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0]];
+    
+    [self.view addConstraints:constraints];
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -142,6 +196,30 @@
     }];
 }
 
+-(void)togglePlaying:(id)sender{
+    if(self.audioPlayer.isPlaying){
+        [self.audioPlayer setIsPlaying:NO callback:^(NSError *error) {
+        
+        }];
+    }else{
+        [self.audioPlayer setIsPlaying:YES callback:^(NSError *error) {
+            
+        }];
+    }
+}
+
+-(void)nextButtonPressed:(id)sender{
+    [self.audioPlayer skipNext:^(NSError *error) {
+        NSLog(@"Skipped to next song");
+    }];
+}
+
+-(void)prevButtonPressed:(id)sender{
+    [self.audioPlayer skipPrevious:^(NSError *error) {
+        NSLog(@"Skipped to previous song");
+    }];
+}
+
 #pragma mark - Track Player Delegates
 
 - (void)audioStreaming:(SPTAudioStreamingController *)audioStreaming didReceiveMessage:(NSString *)message {
@@ -165,6 +243,8 @@
 - (void)audioStreaming:(SPTAudioStreamingController *)audioStreaming didChangePlaybackStatus:(BOOL)isPlaying {
     NSLog(@"is playing = %d", isPlaying);
 }
+
+
 
 /*
 #pragma mark - Navigation

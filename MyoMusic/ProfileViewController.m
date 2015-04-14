@@ -21,6 +21,8 @@
 @property (nonatomic) UILabel *nameLabel;
 @property (nonatomic, weak) SpotifyUser *user;
 @property (nonatomic) MusicPlayerViewController *musicVC;
+@property (nonatomic) NSInteger currentPlayingIndex;
+
 
 -(void)fetchPlaylistPageForSession:(SPTSession *)session error:(NSError *)error object:(id)object;
 
@@ -31,13 +33,18 @@
 
 -(void)loadView {
     [super loadView];
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    self.currentPlayingIndex = -1;
     
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectInset(self.view.frame, 0, self.view.frame.size.height/4) style:UITableViewStylePlain];
-    [self.tableView setCenter:CGPointMake(self.view.center.x, self.view.center.y+self.view.frame.size.height/4)];
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height/2, self.view.frame.size.width, self.view.frame.size.height/2) style:UITableViewStylePlain];
+    self.tableView.contentInset = UIEdgeInsetsZero;
+    
     [self.view addSubview:self.tableView];
     [self.tableView registerClass:[BasicCell class] forCellReuseIdentifier:@"Cell"];
     [self.tableView setDelegate:self];
     [self.tableView setDataSource:self];
+    [self.tableView setBackgroundColor:[UIColor blackColor]];
+    self.tableView.tableHeaderView = nil;
     
     self.userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-self.tableView.frame.size.height)];
     [self.view addSubview:self.userView];
@@ -134,10 +141,18 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     BasicCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-    [cell setBackgroundColor:[UIColor redColor]];
+    NSString *playlistName;
     SPTPartialPlaylist *playlistTemp = [self.playlists objectAtIndex:indexPath.row];
-    NSString *playlistName = playlistTemp.name;
+    playlistName = playlistTemp.name;
     [cell.textLabel setText:playlistName];
+    
+    if(cell.isSelected){
+        [cell setBackgroundColor:[UIColor darkGrayColor]];
+        [cell.textLabel setTextColor:[UIColor whiteColor]];
+    }else{
+        [cell setBackgroundColor:[UIColor blackColor]];
+        [cell.textLabel setTextColor:[UIColor whiteColor]];
+    }
     return cell;
 }
 
@@ -148,11 +163,18 @@
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    NSString *title = @"Playlists";
+    return title;
+}
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    //PlaylistViewController *playlistVC = [PlaylistViewController new];
-    self.musicVC.session = self.user.session;
-    [self.musicVC setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)[self.playlists objectAtIndex:indexPath.row]];
+    if(self.currentPlayingIndex != indexPath.row){
+        self.currentPlayingIndex = indexPath.row;
+        self.musicVC.session = self.user.session;
+        [self.musicVC setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)[self.playlists objectAtIndex:indexPath.row]];
+    }
+    
     [self.navigationController pushViewController:self.musicVC animated:YES];
 }
 

@@ -37,6 +37,8 @@
     [navVC.navigationBar.topItem setTitle:@"MyoMusic"];
     [navVC.navigationItem setBackBarButtonItem:backButton];
     
+    [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:[UIColor whiteColor]];
+    
     SPTAuth *auth = [SPTAuth defaultInstance];
     auth.clientID = @kClientId;
     auth.requestedScopes = @[SPTAuthStreamingScope, SPTAuthPlaylistReadPrivateScope,
