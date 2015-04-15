@@ -16,7 +16,7 @@
 -(void)handle:(SPTSession *)session;
 
 @property (nonatomic) SPTUser *sptUser;
-@property (nonatomic, weak) ProfileViewController *profileVC;
+@property (nonatomic) ProfileViewController *profileVC;
 @property (nonatomic) SPTSession *session;
 
 @end

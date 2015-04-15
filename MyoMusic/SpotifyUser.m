@@ -12,6 +12,7 @@
 @implementation SpotifyUser
 
 static SpotifyUser *userInst = nil;
+
 +(SpotifyUser *)user {
     if (!userInst) {
         static dispatch_once_t onceToken;
@@ -28,7 +29,7 @@ static SpotifyUser *userInst = nil;
     }
     [SPTRequest userInformationForUserInSession:session callback:^(NSError *error, id object) {
         if (!error) {
-            self.sptUser = object;
+            self.sptUser = (SPTUser *)object;
             [self.profileVC reload];
         } else {
             NSLog(@"error: %@", error.localizedDescription);
