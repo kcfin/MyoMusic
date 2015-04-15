@@ -8,6 +8,7 @@
 
 #import "MusicPlayerViewController.h"
 #import "Config.h"
+#import <MyoKit/MyoKit.h>
 
 @interface MusicPlayerViewController () <SPTAudioStreamingDelegate>
 
@@ -33,6 +34,8 @@
 @property (nonatomic)UISlider *volumeSlider;
 @property (nonatomic)NSTimer *playbackTimer;
 
+@property (nonatomic)TLMPose *currentPose;
+
 -(void)updateInfo;
 
 @end
@@ -41,7 +44,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
+    [self setupMyoNotifications];
+    UIBarButtonItem *myoButton = [[UIBarButtonItem alloc] initWithTitle:@"Connect" style:UIBarButtonItemStylePlain target:self action:@selector(connectMyo:)];
+    self.navigationItem.rightBarButtonItem = myoButton;
+    
     self.title = @"Now Playing";
     self.trackURIs = [NSMutableArray new];
     self.currentIndex = 0;
@@ -123,6 +129,135 @@
     // Do any additional setup after loading the view.
 }
 
+-(void)setupMyoNotifications{
+    // Data notifications are received through NSNotificationCenter.
+    // Posted whenever a TLMMyo connects
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didConnectDevice:)
+                                                 name:TLMHubDidConnectDeviceNotification
+                                               object:nil];
+    // Posted whenever a TLMMyo disconnects.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didDisconnectDevice:)
+                                                 name:TLMHubDidDisconnectDeviceNotification
+                                               object:nil];
+    // Posted whenever the user does a successful Sync Gesture.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSyncArm:)
+                                                 name:TLMMyoDidReceiveArmSyncEventNotification
+                                               object:nil];
+    // Posted whenever Myo loses sync with an arm (when Myo is taken off, or moved enough on the user's arm).
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didUnsyncArm:)
+                                                 name:TLMMyoDidReceiveArmUnsyncEventNotification
+                                               object:nil];
+    // Posted whenever Myo is unlocked and the application uses TLMLockingPolicyStandard.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didUnlockDevice:)
+                                                 name:TLMMyoDidReceiveUnlockEventNotification
+                                               object:nil];
+    // Posted whenever Myo is locked and the application uses TLMLockingPolicyStandard.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didLockDevice:)
+                                                 name:TLMMyoDidReceiveLockEventNotification
+                                               object:nil];
+    // Posted when a new orientation event is available from a TLMMyo. Notifications are posted at a rate of 50 Hz.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didReceiveOrientationEvent:)
+                                                 name:TLMMyoDidReceiveOrientationEventNotification
+                                               object:nil];
+    // Posted when a new accelerometer event is available from a TLMMyo. Notifications are posted at a rate of 50 Hz.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didReceiveAccelerometerEvent:)
+                                                 name:TLMMyoDidReceiveAccelerometerEventNotification
+                                               object:nil];
+    // Posted when a new pose is available from a TLMMyo.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didReceivePoseChange:)
+                                                 name:TLMMyoDidReceivePoseChangedNotification
+                                               object:nil];
+}
+
+-(void)didConnectDevice:(NSNotification *)notification{
+    NSLog(@"Connected Device");
+}
+
+-(void)didDisconnectDevice:(NSNotification *)notification{
+    NSLog(@"Disconnected Device");
+}
+
+-(void)didSyncArm:(NSNotification *)notification{
+    NSLog(@"Synced Arm");
+}
+
+-(void)didUnsyncArm:(NSNotification *)notification{
+    NSLog(@"Unsync Arm");
+}
+
+-(void)didUnlockDevice:(NSNotification *)notification{
+    NSLog(@"Unlock Device");
+}
+
+-(void)didLockDevice:(NSNotification *)notification{
+    NSLog(@"Lock Device");
+}
+
+-(void)didReceiveOrientationEvent:(NSNotification *)notification{
+    NSLog(@"Received Orientation");
+}
+
+-(void)didReceiveAccelerometerEvent:(NSNotification *)notification{
+    NSLog(@"Received Acceleration");
+}
+
+-(void)didReceivePoseChange:(NSNotification *)notification{
+    NSLog(@"Received Pose");
+    TLMPose *pose = notification.userInfo[kTLMKeyPose];
+    self.currentPose = pose;
+    
+    // Handle the cases of the TLMPoseType enumeration, and change the color of helloLabel based on the pose we receive.
+    switch (pose.type) {
+        case TLMPoseTypeUnknown:
+        case TLMPoseTypeRest:
+        case TLMPoseTypeDoubleTap:
+            // Changes helloLabel's font to Helvetica Neue when the user is in a rest or unknown pose.
+            NSLog(@"DOUBLE TAP");
+            break;
+        case TLMPoseTypeFist:
+            // Changes helloLabel's font to Noteworthy when the user is in a fist pose.
+            
+            break;
+        case TLMPoseTypeWaveIn:
+            // Changes helloLabel's font to Courier New when the user is in a wave in pose.
+
+            break;
+        case TLMPoseTypeWaveOut:
+            // Changes helloLabel's font to Snell Roundhand when the user is in a wave out pose.
+
+            break;
+        case TLMPoseTypeFingersSpread:
+            // Changes helloLabel's font to Chalkduster when the user is in a fingers spread pose.
+
+            break;
+    }
+    
+    // Unlock the Myo whenever we receive a pose
+    if (pose.type == TLMPoseTypeUnknown || pose.type == TLMPoseTypeRest) {
+        // Causes the Myo to lock after a short period.
+        [pose.myo unlockWithType:TLMUnlockTypeTimed];
+    } else {
+        // Keeps the Myo unlocked until specified.
+        // This is required to keep Myo unlocked while holding a pose, but if a pose is not being held, use
+        // TLMUnlockTypeTimed to restart the timer.
+        [pose.myo unlockWithType:TLMUnlockTypeHold];
+        // Indicates that a user action has been performed.
+        [pose.myo indicateUserAction];
+    }
+
+}
+
+
+
 -(void)createConstraints{
     UIView *trackView = self.trackLabel;
     UIView *artistView = self.artistLabel;
@@ -168,6 +303,13 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)connectMyo:(id)sender{
+    UINavigationController *controller = [TLMSettingsViewController settingsInNavigationController];
+    [self presentViewController:controller animated:YES completion:^{
+        
+    }];
 }
 
 -(void)setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)partialPlaylist{

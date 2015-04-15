@@ -11,6 +11,7 @@
 #import "LoginViewController.h"
 #import "ProfileViewController.h"
 #import "SpotifyUser.h"
+#import <MyoKit/MyoKit.h>
 
 @interface AppDelegate ()
 
@@ -21,6 +22,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [[TLMHub sharedHub] setApplicationIdentifier:@"com.eecs489.myomusic"];
+    
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     [self.window makeKeyAndVisible];
     

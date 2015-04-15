@@ -18,7 +18,7 @@
 @property (nonatomic) UIView *userView;
 @property (nonatomic) UIImageView *profileImageView;
 @property (nonatomic) UILabel *nameLabel;
-@property (nonatomic, weak) SpotifyUser *user;
+@property (nonatomic) SpotifyUser *user;
 @property (nonatomic) MusicPlayerViewController *musicVC;
 @property (nonatomic) NSInteger currentPlayingIndex;
 
@@ -33,6 +33,7 @@
 -(void)loadView {
     [super loadView];
     self.automaticallyAdjustsScrollViewInsets = NO;
+    self.profileImageView = [UIImageView new];
     self.currentPlayingIndex = -1;
     
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height/2, self.view.frame.size.width, self.view.frame.size.height/2) style:UITableViewStylePlain];
@@ -99,14 +100,13 @@
 }
 
 -(void)loadProfilePicture {
-    self.profileImageView = [UIImageView new];
     NSLog(@"PROFILE PIC URL: %@", self.user.sptUser.largestImage.imageURL);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
     self.profileImageView.layer.cornerRadius = self.userView.frame.size.width/6;
     self.profileImageView.layer.masksToBounds = YES;
     self.profileImageView.frame = CGRectMake(0, 0, self.userView.frame.size.width/3, self.userView.frame.size.width/3);
     self.profileImageView.center = self.userView.center;
-    self.profileImageView.backgroundColor = [UIColor whiteColor];
+    self.profileImageView.backgroundColor = [UIColor lightGrayColor];
     [self.userView addSubview:self.profileImageView];
     
     self.nameLabel = [UILabel new];

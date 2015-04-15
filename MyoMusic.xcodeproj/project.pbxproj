@@ -21,6 +21,7 @@
 		BFEA5D641AC8C86600C05DB6 /* Spotify.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFEA5D631AC8C86500C05DB6 /* Spotify.framework */; };
 		BFEA5D661AC8C87200C05DB6 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFEA5D651AC8C87200C05DB6 /* AVFoundation.framework */; };
 		FA579E3A1AD1FCB90020F90F /* MusicPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FA579E391AD1FCB90020F90F /* MusicPlayerViewController.m */; };
+		FA5A13401ADF17EA009AC6D3 /* MyoKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA5A133F1ADF17EA009AC6D3 /* MyoKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,7 @@
 		BFEA5D651AC8C87200C05DB6 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		FA579E381AD1FCB90020F90F /* MusicPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicPlayerViewController.h; sourceTree = "<group>"; };
 		FA579E391AD1FCB90020F90F /* MusicPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicPlayerViewController.m; sourceTree = "<group>"; };
+		FA5A133F1ADF17EA009AC6D3 /* MyoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MyoKit.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA5A13401ADF17EA009AC6D3 /* MyoKit.framework in Frameworks */,
 				BFEA5D661AC8C87200C05DB6 /* AVFoundation.framework in Frameworks */,
 				BFEA5D641AC8C86600C05DB6 /* Spotify.framework in Frameworks */,
 			);
@@ -164,6 +167,7 @@
 		BFEA5D621AC8C84C00C05DB6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FA5A133F1ADF17EA009AC6D3 /* MyoKit.framework */,
 				BFEA5D651AC8C87200C05DB6 /* AVFoundation.framework */,
 				BFEA5D631AC8C86500C05DB6 /* Spotify.framework */,
 			);
@@ -353,7 +357,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -389,7 +393,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -406,6 +410,7 @@
 					"$(PROJECT_DIR)/MyoMusic",
 				);
 				INFOPLIST_FILE = MyoMusic/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -422,6 +427,7 @@
 					"$(PROJECT_DIR)/MyoMusic",
 				);
 				INFOPLIST_FILE = MyoMusic/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
