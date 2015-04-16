@@ -20,11 +20,11 @@
 @property (nonatomic) UILabel *nameLabel;
 @property (nonatomic) SpotifyUser *user;
 @property (nonatomic) MusicPlayerViewController *musicVC;
-@property (nonatomic) PlaylistViewController *pvc;
 @property (nonatomic) NSInteger currentPlayingIndex;
 
 
 -(void)fetchPlaylistPageForSession:(SPTSession *)session error:(NSError *)error object:(id)object;
+
 
 @end
 
@@ -45,21 +45,19 @@
     [self.tableView setDataSource:self];
     [self.tableView setBackgroundColor:[UIColor blackColor]];
     self.tableView.tableHeaderView = nil;
-    self.tableView.rowHeight = self.tableView.frame.size.height/6;
-    self.tableView.scrollEnabled = NO;
     
     self.userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-self.tableView.frame.size.height)];
     [self.view addSubview:self.userView];
-    self.userView.backgroundColor = [UIColor darkGrayColor];
-    [self loadProfilePicture];
-
+    self.userView.backgroundColor = [UIColor whiteColor];
+    
     self.user = [SpotifyUser user];
     self.playlists = [NSMutableArray new];
-    self.pvc = [PlaylistViewController new];
+    
+    self.musicVC = [MusicPlayerViewController new];
     [self.navigationController.navigationBar.topItem setTitle:@"Home"];
+    [self loadProfilePicture];
 }
 
-    
 -(void)reload {
     NSLog(@"RELOADING PROFILE INFO W/ USER: %@", self.user.sptUser.displayName);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
@@ -82,7 +80,7 @@
                 NSLog(@"GOT PLAYLIST");
                 [self.playlists addObject:playlist];
             }
-                        
+            
             if (playlistList.hasNextPage) {
                 NSLog(@"GETTING NEXT PAGE");
                 [playlistList requestNextPageWithSession:session callback:^(NSError *error, id object) {
