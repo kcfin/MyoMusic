@@ -51,7 +51,7 @@
     self.userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-self.tableView.frame.size.height)];
     [self.view addSubview:self.userView];
     self.userView.backgroundColor = [UIColor darkGrayColor];
-    [self loadProfile];
+    [self loadProfilePicture];
 
     self.user = [SpotifyUser user];
     self.playlists = [NSMutableArray new];
@@ -101,8 +101,7 @@
     // Do any additional setup after loading the view.
 }
 
--(void)loadProfile {
-    self.profileImageView = [UIImageView new];
+-(void)loadProfilePicture {
     NSLog(@"PROFILE PIC URL: %@", self.user.sptUser.largestImage.imageURL);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
     self.profileImageView.layer.cornerRadius = self.userView.frame.size.width/6;
@@ -114,9 +113,8 @@
     
     self.nameLabel = [UILabel new];
     self.nameLabel.frame = CGRectMake(0, self.profileImageView.frame.origin.y + self.profileImageView.frame.size.height, self.userView.frame.size.width, 50);
-    self.nameLabel.font = [UIFont fontWithName:@"Avenir-Heavy" size:[UIFont systemFontSize] *2];
     [self.nameLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.nameLabel setTextColor:[UIColor whiteColor]];
+    [self.nameLabel setTextColor:[UIColor blackColor]];
     if(self.user.sptUser.displayName){
         NSLog(@"SETTING DISPLAY NAME");
         self.nameLabel.text = [[NSString alloc] initWithString:self.user.sptUser.displayName];
@@ -126,63 +124,42 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     BasicCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-    [cell.textLabel setTextColor:[UIColor whiteColor]];
+    NSString *playlistName;
+    SPTPartialPlaylist *playlistTemp = [self.playlists objectAtIndex:indexPath.row];
+    playlistName = playlistTemp.name;
+    [cell.textLabel setText:playlistName];
     
-    switch (indexPath.row) {
-        case 0:
-            [cell.textLabel setText:@"Playlists"];
-            break;
-        case 1:
-            [cell.textLabel setText:@"Songs"];
-            break;
-        case 2:
-            [cell.textLabel setText:@"Artists"];
-            break;
-        case 3:
-            [cell.textLabel setText:@"Albums"];
-            break;
-        case 4:
-            [cell.textLabel setText:@"Myo Playlists"];
-            break;
-        default:
-            break;
-    }
-    
-    if(cell.isSelected) {
+    if(cell.isSelected){
         [cell setBackgroundColor:[UIColor darkGrayColor]];
-    } else {
+        [cell.textLabel setTextColor:[UIColor whiteColor]];
+    }else{
         [cell setBackgroundColor:[UIColor blackColor]];
+        [cell.textLabel setTextColor:[UIColor whiteColor]];
     }
-    
     return cell;
-    
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 5;
+    return self.playlists.count;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
-
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
-    NSString *title = @"Music";
+    NSString *title = @"Playlists";
     return title;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    switch (indexPath.row) {
-        case 0:
-            [self.navigationController pushViewController:self.pvc animated:YES];
-            self.pvc.playlists = self.playlists;
-            break;
-        default:
-            break;
+    if(self.currentPlayingIndex != indexPath.row){
+        self.currentPlayingIndex = indexPath.row;
+        self.musicVC.session = self.user.session;
+        [self.musicVC setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)[self.playlists objectAtIndex:indexPath.row]];
     }
+    
+    [self.navigationController pushViewController:self.musicVC animated:YES];
 }
 
 @end
