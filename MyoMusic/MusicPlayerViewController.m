@@ -24,6 +24,7 @@
 @property (nonatomic)UIImageView *coverArt;
 @property (nonatomic)UIImage *playImage;
 @property (nonatomic)UIImage *pauseImage;
+@property (nonatomic)UILabel *myoStatus;
 
 @property (nonatomic)UIButton *playButton;
 @property (nonatomic)UIButton *pauseButton;
@@ -103,6 +104,7 @@
     self.trackLabel.numberOfLines = 1;
     [self.trackLabel setTextAlignment:NSTextAlignmentCenter];
     [self.trackLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    self.trackLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
     
     self.artistLabel = [UILabel new];
     //[self.artistLabel setFrame:CGRectMake(100, 350, 200, 50)];
@@ -112,6 +114,19 @@
     [self.artistLabel setTextColor:[UIColor whiteColor]];
     [self.artistLabel setTextAlignment:NSTextAlignmentCenter];
     [self.artistLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+    self.artistLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
+    
+    self.myoStatus = [UILabel new];
+    [self.myoStatus setClipsToBounds:YES];
+    [self.myoStatus setBackgroundColor:[UIColor blackColor]];
+    [self.myoStatus setTextColor:[UIColor whiteColor]];
+    self.myoStatus.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize] * 2];
+    self.myoStatus.text = @"Myo: Not Connected";
+    [self.myoStatus setLineBreakMode:NSLineBreakByTruncatingTail];
+    [self.myoStatus setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.myoStatus setTextAlignment:NSTextAlignmentCenter];
+
+    
     
     self.coverArt = [UIImageView new];
     //[self.coverArt setFrame:CGRectMake(50, 50, 200, 200)];
@@ -131,6 +146,7 @@
     [self.view addSubview:self.pauseButton];
     [self.view addSubview:self.nextButton];
     [self.view addSubview:self.prevButton];
+    [self.view addSubview:self.myoStatus];
 
     [self createConstraints];
 
@@ -187,26 +203,33 @@
 }
 
 -(void)didConnectDevice:(NSNotification *)notification{
+    self.myoStatus.text = @"Myo: Connected.";
     NSLog(@"Connected Device");
+    
 }
 
 -(void)didDisconnectDevice:(NSNotification *)notification{
+    self.myoStatus.text = @"Myo: Disconnected.";
     NSLog(@"Disconnected Device");
 }
 
 -(void)didSyncArm:(NSNotification *)notification{
+    self.myoStatus.text = @"Myo: Synced Arm.";
     NSLog(@"Synced Arm");
 }
 
 -(void)didUnsyncArm:(NSNotification *)notification{
+    self.myoStatus.text = @"Myo: Unsynced Arm.";
     NSLog(@"Unsync Arm");
 }
 
 -(void)didUnlockDevice:(NSNotification *)notification{
+    self.myoStatus.text = @"Myo: Device Unlocked.";
     NSLog(@"Unlock Device");
 }
 
 -(void)didLockDevice:(NSNotification *)notification{
+    self.myoStatus.text = @"Myo: Device Locked.";
     NSLog(@"Lock Device");
 }
 
@@ -218,8 +241,7 @@
 
     if(self.isAdjustingVolume == YES) {
         NSLog(@"Received Orientation: %d", rotation);
-        
-        //not sure about these roll numbers, need to test
+        self.myoStatus.text = @"Myo: Adjusting volume.";
         [self adjustVolumeWithMyo:rotation - self.latestNoFistRoll];
     } else {
         self.latestNoFistRoll = rotation;
@@ -285,6 +307,8 @@
     switch (pose.type) {
         case TLMPoseTypeUnknown:
         case TLMPoseTypeRest:
+            self.myoStatus.text = @"Myo: Connected.";
+            break;
         case TLMPoseTypeDoubleTap:
             //NSLog(@"DOUBLE TAP");
             break;
@@ -294,14 +318,21 @@
             break;
         case TLMPoseTypeWaveIn:
             // Plays previous song with a wave in pose
+            self.myoStatus.text = @"Myo: Play previous song.";
             [self prevButtonPressed:nil];
             break;
         case TLMPoseTypeWaveOut:
             // Plays next song with a wave out pose
+            self.myoStatus.text = @"Myo: Play next song.";
             [self nextButtonPressed:nil];
             break;
         case TLMPoseTypeFingersSpread:
             // Plays or pauses the music with a fingers spread pose
+            if(self.audioPlayer.isPlaying) {
+                self.myoStatus.text = @"Myo: Pause music.";
+            } else {
+                self.myoStatus.text = @"Myo: Play music.";
+            }
             [self togglePlaying:nil];
             break;
     }
@@ -330,16 +361,21 @@
     UIView *prevView = self.prevButton;
     UIView *playbackView = self.trackSlider;
     UIView *volumeView = self.volumeSlider;
+    UIView *myoStatusView = self.myoStatus;
     
-    NSDictionary *views = NSDictionaryOfVariableBindings(trackView, artistView, coverView, playView, nextView, prevView, playbackView, volumeView, self.view);
+    NSDictionary *views = NSDictionaryOfVariableBindings(trackView, artistView, coverView, playView, nextView, prevView, playbackView, volumeView, myoStatusView, self.view);
     
     NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:[coverView(<=200)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views];
     
     constraints = [constraints arrayByAddingObject:[NSLayoutConstraint constraintWithItem:self.coverArt attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0]];
     
-    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-104-[coverView]-20-[trackView(20)]-10-[artistView(20)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[coverView]-15-[trackView(20)]-10-[artistView(20)]-40-[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]-30-[myoStatusView(40)]-20-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     
-    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[playbackView(20)]-20-[playView(50)]-15-[volumeView(20)]-40-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+//    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]-20-[myoStatusView(50)]-15-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+    
+//    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+    
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[myoStatusView(40)]-20-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-50-[trackView]-50-|" options:0 metrics:nil views:views]];
     
@@ -348,6 +384,8 @@
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-50-[playbackView]-50-|" options:0 metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-50-[volumeView]-50-|" options:0 metrics:nil views:views]];
+    
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-50-[myoStatusView]-50-|" options:0 metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObject:[NSLayoutConstraint constraintWithItem:self.playButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.playButton attribute:NSLayoutAttributeHeight multiplier:1.0 constant:0]];
     
@@ -479,7 +517,7 @@
     if(!self.trackSlider.isTracking){
         [self.trackSlider setValue:self.audioPlayer.currentPlaybackPosition animated:YES];
         [self.trackSlider setMaximumValue:self.audioPlayer.currentTrackDuration];
-//        NSLog(@"updating slider value w/ value: %f and max: %f", self.audioPlayer.currentPlaybackPosition, self.audioPlayer.currentTrackDuration);
+        //NSLog(@"updating slider value w/ value: %f and max: %f", self.audioPlayer.currentPlaybackPosition, self.audioPlayer.currentTrackDuration);
     }
 }
 
