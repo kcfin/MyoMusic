@@ -120,7 +120,7 @@
     [self.myoStatus setClipsToBounds:YES];
     [self.myoStatus setBackgroundColor:[UIColor blackColor]];
     [self.myoStatus setTextColor:[UIColor whiteColor]];
-    self.myoStatus.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize] * 2];
+    self.myoStatus.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
     self.myoStatus.text = @"Myo: Not Connected";
     [self.myoStatus setLineBreakMode:NSLineBreakByTruncatingTail];
     [self.myoStatus setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -369,11 +369,10 @@
     
     constraints = [constraints arrayByAddingObject:[NSLayoutConstraint constraintWithItem:self.coverArt attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0]];
     
-    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[coverView]-15-[trackView(20)]-10-[artistView(20)]-40-[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]-30-[myoStatusView(40)]-20-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[coverView]-15-[trackView(20)]-10-[artistView(20)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     
-//    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]-20-[myoStatusView(50)]-15-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]-20-[myoStatusView(50)]-15-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     
-//    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[myoStatusView(40)]-20-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     

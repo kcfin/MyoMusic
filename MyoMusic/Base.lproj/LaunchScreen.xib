@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7531" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -10,7 +11,10 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="5X4-s4-GFY">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bLn-GE-J4Y">
+                    <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
+                </view>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="5X4-s4-GFY">
                     <rect key="frame" x="0.0" y="233" width="480" height="247"/>
                     <color key="backgroundColor" red="0.13725490200000001" green="0.51764705879999995" blue="0.51764705879999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <color key="sectionIndexColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -32,7 +36,14 @@
             <constraints>
                 <constraint firstItem="J1h-mi-47N" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="10R-9Y-H2n"/>
                 <constraint firstAttribute="trailing" secondItem="J1h-mi-47N" secondAttribute="trailing" id="187-sy-2z2"/>
+                <constraint firstAttribute="bottom" secondItem="bLn-GE-J4Y" secondAttribute="bottom" id="3Id-0z-WqL"/>
+                <constraint firstItem="bLn-GE-J4Y" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="HoR-gp-d9g"/>
+                <constraint firstAttribute="trailing" secondItem="bLn-GE-J4Y" secondAttribute="trailing" id="N14-xU-gBk"/>
+                <constraint firstItem="5X4-s4-GFY" firstAttribute="top" secondItem="bLn-GE-J4Y" secondAttribute="centerY" id="fuD-eB-LW7"/>
+                <constraint firstItem="5X4-s4-GFY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="hrS-0a-YhJ"/>
+                <constraint firstItem="bLn-GE-J4Y" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="j7D-62-pCr"/>
                 <constraint firstAttribute="bottom" secondItem="5X4-s4-GFY" secondAttribute="bottom" id="mhA-ZH-Q70"/>
+                <constraint firstAttribute="trailing" secondItem="5X4-s4-GFY" secondAttribute="trailing" id="qLC-Px-goe"/>
                 <constraint firstItem="J1h-mi-47N" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="20" id="xer-0E-ij9"/>
                 <constraint firstItem="J1h-mi-47N" firstAttribute="top" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="top" constant="20" id="yqc-tn-6RP"/>
             </constraints>
