@@ -211,13 +211,14 @@
 }
 
 -(void)didReceiveOrientationEvent:(NSNotification *)notification{
-    NSLog(@"Received Orientation");
     
     TLMOrientationEvent *orientationEvent = notification.userInfo[kTLMKeyOrientationEvent];
     TLMEulerAngles *angles = [TLMEulerAngles anglesWithQuaternion:orientationEvent.quaternion];
-    int rotation = -angles.roll.degrees * 100;
+    int rotation = angles.roll.degrees;
 
     if(self.isAdjustingVolume == YES) {
+        NSLog(@"Received Orientation: %d", rotation);
+        
         //not sure about these roll numbers, need to test
         [self adjustVolumeWithMyo:rotation - self.latestNoFistRoll];
     } else {
@@ -248,7 +249,7 @@
     } else if (volume >= 1) {
         volume = 1.0f;
     }
-    
+    self.volumeSlider.value = volume;
     [self.audioPlayer setVolume:volume callback:^(NSError *error) {
         
     }];
@@ -256,23 +257,24 @@
 
 -(void)decreaseVolume {
     SPTVolume volume = self.volumeSlider.value;
+    volume -= 0.01;
     if (volume <= 0) {
         volume = 0;
     } else if (volume > 1) {
         volume = 1.0f;
     }
-    
+    self.volumeSlider.value = volume;
     [self.audioPlayer setVolume:volume callback:^(NSError *error) {
         
     }];
 }
 
 -(void)didReceiveAccelerometerEvent:(NSNotification *)notification{
-    NSLog(@"Received Acceleration");
+    //NSLog(@"Received Acceleration");
 }
 
 -(void)didReceivePoseChange:(NSNotification *)notification{
-    NSLog(@"Received Pose");
+    //NSLog(@"Received Pose");
     TLMPose *pose = notification.userInfo[kTLMKeyPose];
     self.currentPose = pose;
     self.isAdjustingVolume = NO;
@@ -282,7 +284,7 @@
         case TLMPoseTypeUnknown:
         case TLMPoseTypeRest:
         case TLMPoseTypeDoubleTap:
-            NSLog(@"DOUBLE TAP");
+            //NSLog(@"DOUBLE TAP");
             break;
         case TLMPoseTypeFist:
             // Triggers adjusting music with fist rotation
@@ -475,7 +477,7 @@
     if(!self.trackSlider.isTracking){
         [self.trackSlider setValue:self.audioPlayer.currentPlaybackPosition animated:YES];
         [self.trackSlider setMaximumValue:self.audioPlayer.currentTrackDuration];
-        NSLog(@"updating slider value w/ value: %f and max: %f", self.audioPlayer.currentPlaybackPosition, self.audioPlayer.currentTrackDuration);
+        //NSLog(@"updating slider value w/ value: %f and max: %f", self.audioPlayer.currentPlaybackPosition, self.audioPlayer.currentTrackDuration);
     }
 }
 
