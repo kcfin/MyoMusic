@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <Spotify/Spotify.h>
+#import "UIColor+MyoMusicColors.h"
 
 @interface MusicPlayerViewController : UIViewController <SPTAudioStreamingDelegate, SPTAudioStreamingPlaybackDelegate>
 

@@ -7,7 +7,6 @@
 //
 
 #import "ProfileViewController.h"
-#import "PlaylistViewController.h"
 #import "MusicPlayerViewController.h"
 #import "BasicCell.h"
 #import "SpotifyUser.h"
@@ -43,12 +42,12 @@
     [self.tableView registerClass:[BasicCell class] forCellReuseIdentifier:@"Cell"];
     [self.tableView setDelegate:self];
     [self.tableView setDataSource:self];
-    [self.tableView setBackgroundColor:[UIColor blackColor]];
+    [self.tableView setBackgroundColor:[UIColor darkerBlue]];
     self.tableView.tableHeaderView = nil;
     
     self.userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-self.tableView.frame.size.height)];
     [self.view addSubview:self.userView];
-    self.userView.backgroundColor = [UIColor whiteColor];
+    self.userView.backgroundColor = [UIColor lighterBlue];
     
     self.user = [SpotifyUser user];
     self.playlists = [NSMutableArray new];
@@ -110,9 +109,10 @@
     [self.userView addSubview:self.profileImageView];
     
     self.nameLabel = [UILabel new];
-    self.nameLabel.frame = CGRectMake(0, self.profileImageView.frame.origin.y + self.profileImageView.frame.size.height, self.userView.frame.size.width, 50);
+    self.nameLabel.frame = CGRectMake(0, self.profileImageView.frame.origin.y + self.profileImageView.frame.size.height + 10, self.userView.frame.size.width, 50);
+    self.nameLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize] * 2];
     [self.nameLabel setTextAlignment:NSTextAlignmentCenter];
-    [self.nameLabel setTextColor:[UIColor blackColor]];
+    [self.nameLabel setTextColor:[UIColor whiteColor]];
     if(self.user.sptUser.displayName){
         NSLog(@"SETTING DISPLAY NAME");
         self.nameLabel.text = [[NSString alloc] initWithString:self.user.sptUser.displayName];
@@ -127,14 +127,18 @@
     SPTPartialPlaylist *playlistTemp = [self.playlists objectAtIndex:indexPath.row];
     playlistName = playlistTemp.name;
     [cell.textLabel setText:playlistName];
+    [cell.textLabel setTextColor:[UIColor whiteColor]];
+    cell.textLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
+    [cell setBackgroundColor:[UIColor darkerBlue]];
     
-    if(cell.isSelected){
-        [cell setBackgroundColor:[UIColor darkGrayColor]];
-        [cell.textLabel setTextColor:[UIColor whiteColor]];
-    }else{
-        [cell setBackgroundColor:[UIColor blackColor]];
-        [cell.textLabel setTextColor:[UIColor whiteColor]];
-    }
+    
+//    if(cell.isSelected){
+//        [cell setBackgroundColor:[UIColor darkGrayColor]];
+//        [cell.textLabel setTextColor:[UIColor whiteColor]];
+//    }else{
+//        [cell setBackgroundColor:[UIColor blackColor]];
+//        [cell.textLabel setTextColor:[UIColor whiteColor]];
+//    }
     return cell;
 }
 
@@ -145,7 +149,10 @@
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
+
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    
+    [[UITableViewHeaderFooterView appearance] setTintColor:[UIColor orange]];
     NSString *title = @"Playlists";
     return title;
 }

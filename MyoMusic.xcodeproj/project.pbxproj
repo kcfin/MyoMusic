@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		BF2709F11ADD91EC00F01D07 /* AlbumViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF2709F01ADD91EC00F01D07 /* AlbumViewController.m */; };
+		BF2709F71AE0023C00F01D07 /* UIColor+MyoMusicColors.m in Sources */ = {isa = PBXBuildFile; fileRef = BF2709F61AE0023C00F01D07 /* UIColor+MyoMusicColors.m */; };
 		BF4CD98F1AC8CACF00211ED9 /* SpotifyUser.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD98E1AC8CACF00211ED9 /* SpotifyUser.m */; };
 		BF4CD9931AC8CB6F00211ED9 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD9921AC8CB6F00211ED9 /* ProfileViewController.m */; };
 		BF4CD9961AC8CB9E00211ED9 /* BasicCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD9951AC8CB9E00211ED9 /* BasicCell.m */; };
-		BF4CD9991AC8CBBF00211ED9 /* PlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD9981AC8CBBF00211ED9 /* PlaylistViewController.m */; };
 		BF4CD99C1AC8CBF900211ED9 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF4CD99B1AC8CBF900211ED9 /* LoginViewController.m */; };
 		BFEA5D3E1AC8C7D600C05DB6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BFEA5D3D1AC8C7D600C05DB6 /* main.m */; };
 		BFEA5D411AC8C7D600C05DB6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BFEA5D401AC8C7D600C05DB6 /* AppDelegate.m */; };
@@ -38,6 +38,8 @@
 /* Begin PBXFileReference section */
 		BF2709EF1ADD91EC00F01D07 /* AlbumViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumViewController.h; sourceTree = "<group>"; };
 		BF2709F01ADD91EC00F01D07 /* AlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumViewController.m; sourceTree = "<group>"; };
+		BF2709F51AE0023C00F01D07 /* UIColor+MyoMusicColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+MyoMusicColors.h"; sourceTree = "<group>"; };
+		BF2709F61AE0023C00F01D07 /* UIColor+MyoMusicColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+MyoMusicColors.m"; sourceTree = "<group>"; };
 		BF4CD98C1AC8CA7B00211ED9 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		BF4CD98D1AC8CACF00211ED9 /* SpotifyUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpotifyUser.h; sourceTree = "<group>"; };
 		BF4CD98E1AC8CACF00211ED9 /* SpotifyUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpotifyUser.m; sourceTree = "<group>"; };
@@ -45,8 +47,6 @@
 		BF4CD9921AC8CB6F00211ED9 /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
 		BF4CD9941AC8CB9E00211ED9 /* BasicCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicCell.h; sourceTree = "<group>"; };
 		BF4CD9951AC8CB9E00211ED9 /* BasicCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasicCell.m; sourceTree = "<group>"; };
-		BF4CD9971AC8CBBF00211ED9 /* PlaylistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaylistViewController.h; sourceTree = "<group>"; };
-		BF4CD9981AC8CBBF00211ED9 /* PlaylistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaylistViewController.m; sourceTree = "<group>"; };
 		BF4CD99A1AC8CBF900211ED9 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		BF4CD99B1AC8CBF900211ED9 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		BFEA5D381AC8C7D600C05DB6 /* MyoMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyoMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -128,14 +128,14 @@
 				BF4CD9921AC8CB6F00211ED9 /* ProfileViewController.m */,
 				BF4CD9941AC8CB9E00211ED9 /* BasicCell.h */,
 				BF4CD9951AC8CB9E00211ED9 /* BasicCell.m */,
-				BF4CD9971AC8CBBF00211ED9 /* PlaylistViewController.h */,
-				BF4CD9981AC8CBBF00211ED9 /* PlaylistViewController.m */,
 				BF2709EF1ADD91EC00F01D07 /* AlbumViewController.h */,
 				BF2709F01ADD91EC00F01D07 /* AlbumViewController.m */,
 				FA579E381AD1FCB90020F90F /* MusicPlayerViewController.h */,
 				FA579E391AD1FCB90020F90F /* MusicPlayerViewController.m */,
 				BF4CD99A1AC8CBF900211ED9 /* LoginViewController.h */,
 				BF4CD99B1AC8CBF900211ED9 /* LoginViewController.m */,
+				BF2709F51AE0023C00F01D07 /* UIColor+MyoMusicColors.h */,
+				BF2709F61AE0023C00F01D07 /* UIColor+MyoMusicColors.m */,
 				BF4CD9901AC8CB5300211ED9 /* Storyboard */,
 				BFEA5D621AC8C84C00C05DB6 /* Frameworks */,
 				BFEA5D3B1AC8C7D600C05DB6 /* Supporting Files */,
@@ -282,12 +282,12 @@
 				BF4CD99C1AC8CBF900211ED9 /* LoginViewController.m in Sources */,
 				BF4CD98F1AC8CACF00211ED9 /* SpotifyUser.m in Sources */,
 				BF2709F11ADD91EC00F01D07 /* AlbumViewController.m in Sources */,
-				BF4CD9991AC8CBBF00211ED9 /* PlaylistViewController.m in Sources */,
 				FA579E3A1AD1FCB90020F90F /* MusicPlayerViewController.m in Sources */,
 				BF4CD9961AC8CB9E00211ED9 /* BasicCell.m in Sources */,
 				BFEA5D411AC8C7D600C05DB6 /* AppDelegate.m in Sources */,
 				BFEA5D3E1AC8C7D600C05DB6 /* main.m in Sources */,
 				BF4CD9931AC8CB6F00211ED9 /* ProfileViewController.m in Sources */,
+				BF2709F71AE0023C00F01D07 /* UIColor+MyoMusicColors.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

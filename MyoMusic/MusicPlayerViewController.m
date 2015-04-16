@@ -18,6 +18,8 @@
 @property (nonatomic)SPTTrack *currentTrack;
 @property (nonatomic)SPTArtist *currentArtist;
 @property (nonatomic)NSInteger currentIndex;
+@property (nonatomic)UIView *trackView;
+@property (nonatomic)UIView *controlView;
 
 @property (nonatomic)UILabel *trackLabel;
 @property (nonatomic)UILabel *artistLabel;
@@ -36,6 +38,11 @@
 
 @property (nonatomic)TLMPose *currentPose;
 
+@property (nonatomic)BOOL isAdjustingVolume;
+@property (nonatomic)int latestNoFistRoll;
+@property (nonatomic) NSTimer *volumeIncreaseTimer;
+@property (nonatomic) NSTimer *volumeDecreaseTimer;
+
 -(void)updateInfo;
 
 @end
@@ -47,6 +54,8 @@
     [self setupMyoNotifications];
     UIBarButtonItem *myoButton = [[UIBarButtonItem alloc] initWithTitle:@"Connect" style:UIBarButtonItemStylePlain target:self action:@selector(connectMyo:)];
     self.navigationItem.rightBarButtonItem = myoButton;
+    
+    self.isAdjustingVolume = NO;
     
     self.title = @"Now Playing";
     self.trackURIs = [NSMutableArray new];
@@ -111,6 +120,12 @@
     [self.coverArt setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     [self.view setCenter:CGPointMake([UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2)];
+    
+    
+//    self.trackView = [UIView new];
+//    self.trackView.backgroundColor = [UIColor lighterBlue];
+//    self.controlView = [UIView new];
+//    self.controlView.backgroundColor = [UIColor darkerBlue];
     
     [self.view addSubview:self.volumeSlider];
     [self.view addSubview:self.trackSlider];
@@ -204,6 +219,59 @@
 
 -(void)didReceiveOrientationEvent:(NSNotification *)notification{
     NSLog(@"Received Orientation");
+    
+    TLMOrientationEvent *orientationEvent = notification.userInfo[kTLMKeyOrientationEvent];
+    TLMEulerAngles *angles = [TLMEulerAngles anglesWithQuaternion:orientationEvent.quaternion];
+    int rotation = -angles.roll.degrees * 100;
+
+    if(self.isAdjustingVolume == YES) {
+        //not sure about these roll numbers, need to test
+        [self adjustVolumeWithMyo:rotation - self.latestNoFistRoll];
+    } else {
+        self.latestNoFistRoll = rotation;
+    }
+}
+
+-(void)adjustVolumeWithMyo:(int)rotation {
+    BOOL shouldIncrease = rotation > 30;
+    BOOL shouldDecrease = rotation < -30;
+    
+    if (shouldIncrease) {
+        [self.volumeDecreaseTimer invalidate];
+        self.volumeIncreaseTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(increaseVolume) userInfo:nil repeats:NO];
+        [self.volumeIncreaseTimer fire];
+    } else if (shouldDecrease) {
+        [self.volumeIncreaseTimer invalidate];
+        self.volumeDecreaseTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(decreaseVolume) userInfo:nil repeats:NO];
+        [self.volumeDecreaseTimer fire];
+    }
+}
+
+-(void)increaseVolume {
+    SPTVolume volume = self.volumeSlider.value;
+    volume += 0.01;
+    if (volume < 0) {
+        volume = 0;
+    } else if (volume >= 1) {
+        volume = 1.0f;
+    }
+    
+    [self.audioPlayer setVolume:volume callback:^(NSError *error) {
+        
+    }];
+}
+
+-(void)decreaseVolume {
+    SPTVolume volume = self.volumeSlider.value;
+    if (volume <= 0) {
+        volume = 0;
+    } else if (volume > 1) {
+        volume = 1.0f;
+    }
+    
+    [self.audioPlayer setVolume:volume callback:^(NSError *error) {
+        
+    }];
 }
 
 -(void)didReceiveAccelerometerEvent:(NSNotification *)notification{
@@ -214,30 +282,30 @@
     NSLog(@"Received Pose");
     TLMPose *pose = notification.userInfo[kTLMKeyPose];
     self.currentPose = pose;
+    self.isAdjustingVolume = NO;
     
     // Handle the cases of the TLMPoseType enumeration, and change the color of helloLabel based on the pose we receive.
     switch (pose.type) {
         case TLMPoseTypeUnknown:
         case TLMPoseTypeRest:
         case TLMPoseTypeDoubleTap:
-            // Changes helloLabel's font to Helvetica Neue when the user is in a rest or unknown pose.
             NSLog(@"DOUBLE TAP");
             break;
         case TLMPoseTypeFist:
-            // Changes helloLabel's font to Noteworthy when the user is in a fist pose.
-            
+            // Triggers adjusting music with fist rotation
+            self.isAdjustingVolume = YES;
             break;
         case TLMPoseTypeWaveIn:
-            // Changes helloLabel's font to Courier New when the user is in a wave in pose.
-
+            // Plays previous song with a wave in pose
+            [self prevButtonPressed:nil];
             break;
         case TLMPoseTypeWaveOut:
-            // Changes helloLabel's font to Snell Roundhand when the user is in a wave out pose.
-
+            // Plays next song with a wave out pose
+            [self nextButtonPressed:nil];
             break;
         case TLMPoseTypeFingersSpread:
-            // Changes helloLabel's font to Chalkduster when the user is in a fingers spread pose.
-
+            // Plays or pauses the music with a fingers spread pose
+            [self togglePlaying:nil];
             break;
     }
     
@@ -255,8 +323,6 @@
     }
 
 }
-
-
 
 -(void)createConstraints{
     UIView *trackView = self.trackLabel;
@@ -364,8 +430,10 @@
             }
             self.currentTrack = [self.currentPlaylist.tracksForPlayback objectAtIndex:self.currentIndex];
             self.trackLabel.text = self.currentTrack.name;
+            self.trackLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
             SPTPartialArtist *artist = (SPTPartialArtist *)[self.currentTrack.artists objectAtIndex:self.currentIndex];
             self.artistLabel.text = artist.name;
+            self.artistLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
             
             [self.trackSlider setMaximumValue:self.audioPlayer.currentTrackDuration];
             [self.trackSlider setValue:self.audioPlayer.currentPlaybackPosition animated:YES];
@@ -391,15 +459,8 @@
                             return;
                         }
                     });
-                    
-                    // Also generate a blurry version for the background
-                    //UIImage *blurred = [self applyBlurOnImage:image withRadius:10.0f];
-//                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        self.coverView2.image = blurred;
-//                    });
                 });
             }
-            
         }];
     }];
 }
