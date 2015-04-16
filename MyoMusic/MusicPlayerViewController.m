@@ -18,8 +18,6 @@
 @property (nonatomic)SPTTrack *currentTrack;
 @property (nonatomic)SPTArtist *currentArtist;
 @property (nonatomic)NSInteger currentIndex;
-@property (nonatomic)UIView *trackView;
-@property (nonatomic)UIView *controlView;
 
 @property (nonatomic)UILabel *trackLabel;
 @property (nonatomic)UILabel *artistLabel;
@@ -122,10 +120,7 @@
     [self.view setCenter:CGPointMake([UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2)];
     
     
-//    self.trackView = [UIView new];
-//    self.trackView.backgroundColor = [UIColor lighterBlue];
-//    self.controlView = [UIView new];
-//    self.controlView.backgroundColor = [UIColor darkerBlue];
+    self.view.backgroundColor = [UIColor blackColor];
     
     [self.view addSubview:self.volumeSlider];
     [self.view addSubview:self.trackSlider];
@@ -138,8 +133,6 @@
     [self.view addSubview:self.prevButton];
 
     [self createConstraints];
-    
-    self.view.backgroundColor = [UIColor blackColor];
 
     // Do any additional setup after loading the view.
 }

@@ -7,18 +7,23 @@
 //
 
 #import "BasicCell.h"
+#import "UIColor+MyoMusicColors.h"
 
 @implementation BasicCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    self.backgroundColor = [UIColor blackColor];
+    self.backgroundColor = [UIColor darkerBlue];
+    [self setSelectionStyle:UITableViewCellSelectionStyleNone];
+    [self.textLabel setTextColor:[UIColor whiteColor]];
+    self.textLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
     return self;
 }
 
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
+    self.backgroundColor = [UIColor darkerBlue];
     NSLog(@"DID SELECT CELL");
 }
 

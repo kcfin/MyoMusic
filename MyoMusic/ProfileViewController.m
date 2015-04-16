@@ -127,18 +127,7 @@
     SPTPartialPlaylist *playlistTemp = [self.playlists objectAtIndex:indexPath.row];
     playlistName = playlistTemp.name;
     [cell.textLabel setText:playlistName];
-    [cell.textLabel setTextColor:[UIColor whiteColor]];
-    cell.textLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
-    [cell setBackgroundColor:[UIColor darkerBlue]];
-    
-    
-//    if(cell.isSelected){
-//        [cell setBackgroundColor:[UIColor darkGrayColor]];
-//        [cell.textLabel setTextColor:[UIColor whiteColor]];
-//    }else{
-//        [cell setBackgroundColor:[UIColor blackColor]];
-//        [cell.textLabel setTextColor:[UIColor whiteColor]];
-//    }
+
     return cell;
 }
 
