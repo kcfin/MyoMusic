@@ -215,7 +215,7 @@
     
     TLMOrientationEvent *orientationEvent = notification.userInfo[kTLMKeyOrientationEvent];
     TLMEulerAngles *angles = [TLMEulerAngles anglesWithQuaternion:orientationEvent.quaternion];
-    int rotation = -angles.roll.degrees * 100;
+    int rotation = angles.roll.degrees;
 
     if(self.isAdjustingVolume == YES) {
         //not sure about these roll numbers, need to test
@@ -241,6 +241,7 @@
 }
 
 -(void)increaseVolume {
+    
     SPTVolume volume = self.volumeSlider.value;
     volume += 0.01;
     if (volume < 0) {
@@ -249,6 +250,7 @@
         volume = 1.0f;
     }
     
+    self.volumeSlider.value = volume;
     [self.audioPlayer setVolume:volume callback:^(NSError *error) {
         
     }];
@@ -475,7 +477,7 @@
     if(!self.trackSlider.isTracking){
         [self.trackSlider setValue:self.audioPlayer.currentPlaybackPosition animated:YES];
         [self.trackSlider setMaximumValue:self.audioPlayer.currentTrackDuration];
-        NSLog(@"updating slider value w/ value: %f and max: %f", self.audioPlayer.currentPlaybackPosition, self.audioPlayer.currentTrackDuration);
+//        NSLog(@"updating slider value w/ value: %f and max: %f", self.audioPlayer.currentPlaybackPosition, self.audioPlayer.currentTrackDuration);
     }
 }
 
