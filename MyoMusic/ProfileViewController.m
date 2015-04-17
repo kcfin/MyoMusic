@@ -10,6 +10,7 @@
 #import "MusicPlayerViewController.h"
 #import "BasicCell.h"
 #import "SpotifyUser.h"
+#import "LoginViewController.h"
 
 @interface ProfileViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -34,9 +35,14 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.profileImageView = [UIImageView new];
     self.currentPlayingIndex = -1;
+    
     UIBarButtonItem *nowplaying = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(goToNowPlaying:)];
     self.navigationItem.rightBarButtonItem = nowplaying;
     [self.navigationItem.rightBarButtonItem setEnabled:NO];
+    
+    UIBarButtonItem *logout = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(logoutPressed:)];
+    self.navigationItem.leftBarButtonItem = logout;
+    
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height/2, self.view.frame.size.width, self.view.frame.size.height/2) style:UITableViewStylePlain];
     self.tableView.contentInset = UIEdgeInsetsZero;
     
@@ -56,6 +62,7 @@
     
     self.musicVC = [MusicPlayerViewController new];
     [self.navigationController.navigationBar.topItem setTitle:@"Home"];
+
     [self loadProfilePicture];
 }
 
@@ -103,6 +110,9 @@
 -(void)loadProfilePicture {
     NSLog(@"PROFILE PIC URL: %@", self.user.sptUser.largestImage.imageURL);
     self.profileImageView.image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:self.user.sptUser.largestImage.imageURL]];
+    if(!self.profileImageView.image){
+        [self.profileImageView setImage:[UIImage imageNamed:@"man.png"]];
+    }
     self.profileImageView.layer.cornerRadius = self.userView.frame.size.width/6;
     self.profileImageView.layer.masksToBounds = YES;
     self.profileImageView.frame = CGRectMake(0, 0, self.userView.frame.size.width/3, self.userView.frame.size.width/3);
@@ -152,16 +162,38 @@
     [self.navigationItem.rightBarButtonItem setTitle:@"Player"];
     [self.navigationItem.rightBarButtonItem setEnabled:YES];
     
+    if(!self.musicVC){
+        self.musicVC = [MusicPlayerViewController new];
+    }
+    
     if(self.currentPlayingIndex != indexPath.row){
         self.currentPlayingIndex = indexPath.row;
         self.musicVC.session = self.user.session;
         [self.musicVC setPlaylistWithPartialPlaylist:(SPTPartialPlaylist *)[self.playlists objectAtIndex:indexPath.row]];
     }
-    
     [self.navigationController pushViewController:self.musicVC animated:YES];
 }
 
 -(void)goToNowPlaying:(id)sender{
     [self.navigationController pushViewController:self.musicVC animated:YES];
+}
+
+-(void)logoutPressed:(id)sender{
+    SPTAuth *auth = [SPTAuth defaultInstance];
+    [self.playlists removeAllObjects];
+    [self.profileImageView setImage:[UIImage imageNamed:@"man.png"]];
+    self.nameLabel.text = @"";
+    self.currentPlayingIndex = -1;
+    [self.tableView reloadData];
+    if (self.musicVC.audioPlayer) {
+        [self.musicVC.audioPlayer logout:^(NSError *error) {
+            auth.session = nil;
+            self.musicVC = nil;
+            [self.navigationController pushViewController:[LoginViewController new] animated:YES];
+        }];
+    } else {
+        self.musicVC = nil;
+        [self.navigationController pushViewController:[LoginViewController new] animated:YES];
+    }
 }
 @end

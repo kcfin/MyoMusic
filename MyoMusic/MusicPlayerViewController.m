@@ -13,7 +13,6 @@
 @interface MusicPlayerViewController () <SPTAudioStreamingDelegate>
 
 @property (nonatomic)SPTPlaylistSnapshot *currentPlaylist;
-@property (nonatomic)SPTAudioStreamingController *audioPlayer;
 @property (nonatomic)NSMutableArray *trackURIs;
 @property (nonatomic)SPTTrack *currentTrack;
 @property (nonatomic)SPTArtist *currentArtist;
@@ -30,6 +29,7 @@
 @property (nonatomic)UIButton *pauseButton;
 @property (nonatomic)UIButton *nextButton;
 @property (nonatomic)UIButton *prevButton;
+@property (nonatomic)UIButton *shuffleButton;
 
 @property (nonatomic)UISlider *trackSlider;
 @property (nonatomic)UISlider *volumeSlider;
@@ -41,6 +41,7 @@
 @property (nonatomic)int latestNoFistRoll;
 @property (nonatomic) NSTimer *volumeIncreaseTimer;
 @property (nonatomic) NSTimer *volumeDecreaseTimer;
+
 
 @end
 
@@ -93,6 +94,12 @@
     [self.prevButton addTarget:self action:@selector(prevButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self.prevButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     
+    UIImage *shuffleImage = [UIImage imageNamed:@"shuffleButton.png"];
+    self.shuffleButton = [UIButton new];
+    [self.shuffleButton setImage:shuffleImage forState:UIControlStateNormal];
+    [self.shuffleButton addTarget:self action:@selector(shuffleButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [self.shuffleButton setTranslatesAutoresizingMaskIntoConstraints:NO];
+    
     self.trackLabel = [UILabel new];
     [self.trackLabel setTextColor:[UIColor whiteColor]];
     [self.trackLabel setClipsToBounds:YES];
@@ -141,6 +148,7 @@
     [self.view addSubview:self.pauseButton];
     [self.view addSubview:self.nextButton];
     [self.view addSubview:self.prevButton];
+    [self.view addSubview:self.shuffleButton];
     [self.view addSubview:self.myoStatus];
 
     [self createConstraints];
@@ -330,8 +338,9 @@
     UIView *playbackView = self.trackSlider;
     UIView *volumeView = self.volumeSlider;
     UIView *myoStatusView = self.myoStatus;
+    UIView *shuffleView = self.shuffleButton;
     
-    NSDictionary *views = NSDictionaryOfVariableBindings(trackView, artistView, coverView, playView, nextView, prevView, playbackView, volumeView, myoStatusView, self.view);
+    NSDictionary *views = NSDictionaryOfVariableBindings(trackView, artistView, coverView, playView, nextView, prevView, playbackView, volumeView, myoStatusView, shuffleView, self.view);
     
     NSArray *constraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:[coverView(<=200)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views];
     
@@ -353,6 +362,10 @@
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-50-[volumeView]-50-|" options:0 metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-50-[myoStatusView]-50-|" options:0 metrics:nil views:views]];
+    
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[shuffleView(30)]-20-|" options:0 metrics:nil views:views]];
+    
+    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[shuffleView(30)]-20-|" options:0 metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObject:[NSLayoutConstraint constraintWithItem:self.playButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.playButton attribute:NSLayoutAttributeHeight multiplier:1.0 constant:0]];
     
@@ -501,42 +514,58 @@
 
 -(void)nextButtonPressed:(id)sender{
     
-    self.currentIndex++;
-    self.currentIndex = self.currentIndex % self.trackURIs.count;
+    if(self.currentIndex == (self.trackURIs.count - 1) && !self.audioPlayer.shuffle){
+        self.currentIndex = 0;
+        SPTPlayOptions *playOptions = [SPTPlayOptions new];
+        playOptions.startTime = 0;
+        playOptions.trackIndex = self.currentIndex;
+        [self.audioPlayer playURIs:self.trackURIs withOptions:playOptions callback:^(NSError *error) {
+            if(error != nil){
+                NSLog(@"ERROR: %@", error);
+                abort();
+            }
+        }];
+    }else{
+        [self.audioPlayer skipNext:^(NSError *error) {
+            
+        }];
+    }
     
-    SPTPlayOptions *playOptions = [SPTPlayOptions new];
-    playOptions.startTime = 0;
-    playOptions.trackIndex = self.currentIndex;
-    [self.audioPlayer playURIs:self.trackURIs withOptions:playOptions callback:^(NSError *error) {
-        if(error != nil){
-            NSLog(@"ERROR: %@", error);
-            abort();
-        }
-        [self.playButton setImage:self.pauseImage forState:UIControlStateNormal];
-    }];
+
     
     NSLog(@"Skipped to next song");
 }
 
 -(void)prevButtonPressed:(id)sender{
-    if(self.currentIndex == 0){
+    if(self.currentIndex == 0 && !self.audioPlayer.shuffle){
         self.currentIndex = self.trackURIs.count-1;
+        SPTPlayOptions *playOptions = [SPTPlayOptions new];
+        playOptions.startTime = 0;
+        playOptions.trackIndex = self.currentIndex;
+        
+        [self.audioPlayer playURIs:self.trackURIs withOptions:playOptions callback:^(NSError *error) {
+            if(error != nil){
+                NSLog(@"ERROR: %@", error);
+                abort();
+            }
+        }];
+        
     }else{
-        self.currentIndex--;
+        [self.audioPlayer skipPrevious:^(NSError *error) {
+            
+        }];
     }
     
-    SPTPlayOptions *playOptions = [SPTPlayOptions new];
-    playOptions.startTime = 0;
-    playOptions.trackIndex = self.currentIndex;
-    
-    [self.audioPlayer playURIs:self.trackURIs withOptions:playOptions callback:^(NSError *error) {
-        if(error != nil){
-            NSLog(@"ERROR: %@", error);
-            abort();
-        }
-        [self.playButton setImage:self.pauseImage forState:UIControlStateNormal];
-    }];
-    
+}
+
+-(void)shuffleButtonPressed:(id)sender{
+    if(self.audioPlayer.shuffle){
+        self.audioPlayer.shuffle = NO;
+        [self.shuffleButton setImage:[UIImage imageNamed:@"shuffleButton.png"] forState:UIControlStateNormal];
+    }else{
+        self.audioPlayer.shuffle = YES;
+        [self.shuffleButton setImage:[UIImage imageNamed:@"shuffleButtonPressed.png"] forState:UIControlStateNormal];
+    }
 }
 
 #pragma mark - Track Player Delegates
