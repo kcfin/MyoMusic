@@ -42,8 +42,6 @@
 @property (nonatomic) NSTimer *volumeIncreaseTimer;
 @property (nonatomic) NSTimer *volumeDecreaseTimer;
 
--(void)updateInfo;
-
 @end
 
 @implementation MusicPlayerViewController
@@ -96,7 +94,6 @@
     [self.prevButton setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     self.trackLabel = [UILabel new];
-    //[self.trackLabel setFrame:CGRectMake(50, 300, 250, 50)];
     [self.trackLabel setTextColor:[UIColor whiteColor]];
     [self.trackLabel setClipsToBounds:YES];
     [self.trackLabel setLineBreakMode:NSLineBreakByTruncatingTail];
@@ -107,7 +104,6 @@
     self.trackLabel.font = [UIFont fontWithName:@"AppleGothic" size:[UIFont systemFontSize]];
     
     self.artistLabel = [UILabel new];
-    //[self.artistLabel setFrame:CGRectMake(100, 350, 200, 50)];
     [self.artistLabel setLineBreakMode:NSLineBreakByTruncatingTail];
     [self.artistLabel setClipsToBounds:YES];
     self.artistLabel.backgroundColor = [UIColor blackColor];
@@ -129,7 +125,6 @@
     
     
     self.coverArt = [UIImageView new];
-    //[self.coverArt setFrame:CGRectMake(50, 50, 200, 200)];
     [self.coverArt setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     [self.view setCenter:CGPointMake([UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2)];
@@ -154,48 +149,34 @@
 }
 
 -(void)setupMyoNotifications{
-    // Data notifications are received through NSNotificationCenter.
-    // Posted whenever a TLMMyo connects
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didConnectDevice:)
                                                  name:TLMHubDidConnectDeviceNotification
                                                object:nil];
-    // Posted whenever a TLMMyo disconnects.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didDisconnectDevice:)
                                                  name:TLMHubDidDisconnectDeviceNotification
                                                object:nil];
-    // Posted whenever the user does a successful Sync Gesture.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didSyncArm:)
                                                  name:TLMMyoDidReceiveArmSyncEventNotification
                                                object:nil];
-    // Posted whenever Myo loses sync with an arm (when Myo is taken off, or moved enough on the user's arm).
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didUnsyncArm:)
                                                  name:TLMMyoDidReceiveArmUnsyncEventNotification
                                                object:nil];
-    // Posted whenever Myo is unlocked and the application uses TLMLockingPolicyStandard.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didUnlockDevice:)
                                                  name:TLMMyoDidReceiveUnlockEventNotification
                                                object:nil];
-    // Posted whenever Myo is locked and the application uses TLMLockingPolicyStandard.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didLockDevice:)
                                                  name:TLMMyoDidReceiveLockEventNotification
                                                object:nil];
-    // Posted when a new orientation event is available from a TLMMyo. Notifications are posted at a rate of 50 Hz.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didReceiveOrientationEvent:)
                                                  name:TLMMyoDidReceiveOrientationEventNotification
                                                object:nil];
-    // Posted when a new accelerometer event is available from a TLMMyo. Notifications are posted at a rate of 50 Hz.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(didReceiveAccelerometerEvent:)
-                                                 name:TLMMyoDidReceiveAccelerometerEventNotification
-                                               object:nil];
-    // Posted when a new pose is available from a TLMMyo.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didReceivePoseChange:)
                                                  name:TLMMyoDidReceivePoseChangedNotification
@@ -293,24 +274,18 @@
     }];
 }
 
--(void)didReceiveAccelerometerEvent:(NSNotification *)notification{
-    //NSLog(@"Received Acceleration");
-}
-
 -(void)didReceivePoseChange:(NSNotification *)notification{
-    //NSLog(@"Received Pose");
     TLMPose *pose = notification.userInfo[kTLMKeyPose];
     self.currentPose = pose;
     self.isAdjustingVolume = NO;
     
-    // Handle the cases of the TLMPoseType enumeration, and change the color of helloLabel based on the pose we receive.
     switch (pose.type) {
         case TLMPoseTypeUnknown:
         case TLMPoseTypeRest:
             self.myoStatus.text = @"Myo: Connected.";
             break;
         case TLMPoseTypeDoubleTap:
-            //NSLog(@"DOUBLE TAP");
+            //Unlock
             break;
         case TLMPoseTypeFist:
             // Triggers adjusting music with fist rotation
@@ -327,7 +302,6 @@
             [self nextButtonPressed:nil];
             break;
         case TLMPoseTypeFingersSpread:
-            // Plays or pauses the music with a fingers spread pose
             if(self.audioPlayer.isPlaying) {
                 self.myoStatus.text = @"Myo: Pause music.";
             } else {
@@ -337,16 +311,10 @@
             break;
     }
     
-    // Unlock the Myo whenever we receive a pose
     if (pose.type == TLMPoseTypeUnknown || pose.type == TLMPoseTypeRest) {
-        // Causes the Myo to lock after a short period.
         [pose.myo unlockWithType:TLMUnlockTypeTimed];
     } else {
-        // Keeps the Myo unlocked until specified.
-        // This is required to keep Myo unlocked while holding a pose, but if a pose is not being held, use
-        // TLMUnlockTypeTimed to restart the timer.
         [pose.myo unlockWithType:TLMUnlockTypeHold];
-        // Indicates that a user action has been performed.
         [pose.myo indicateUserAction];
     }
 
@@ -417,6 +385,7 @@
         [SPTRequest requestItemAtURI:partialPlaylist.uri withSession:self.session callback:^(NSError *error, id object) {
             if([object isKindOfClass:[SPTPlaylistSnapshot class]]){
                 self.currentPlaylist = (SPTPlaylistSnapshot *)object;
+                [self.trackURIs removeAllObjects];
                 NSLog(@"PLAYLIST SIZE: %lu", (unsigned long)self.currentPlaylist.trackCount);
                 unsigned int i = 0;
                 if(self.currentPlaylist.trackCount > 0){
@@ -432,13 +401,9 @@
     }
 }
 
--(void)updateInfo{
-    NSLog(@"SHOULD UPDATE TRACK INFO");
-}
-
 -(void)handleNewSession {
     SPTAuth *auth = [SPTAuth defaultInstance];
-    
+    self.currentIndex = 0;
     if (self.audioPlayer == nil) {
         self.audioPlayer = [[SPTAudioStreamingController alloc] initWithClientId:auth.clientID];
         self.audioPlayer.playbackDelegate = self;
@@ -548,10 +513,6 @@
             abort();
         }
         [self.playButton setImage:self.pauseImage forState:UIControlStateNormal];
-        self.currentTrack = [self.currentPlaylist.tracksForPlayback objectAtIndex:self.currentIndex];
-        self.trackLabel.text = self.currentTrack.name;
-        SPTPartialArtist *artist = (SPTPartialArtist *)[self.currentTrack.artists objectAtIndex:0];
-        self.artistLabel.text = artist.name;
     }];
     
     NSLog(@"Skipped to next song");
@@ -574,10 +535,6 @@
             abort();
         }
         [self.playButton setImage:self.pauseImage forState:UIControlStateNormal];
-        self.currentTrack = [self.currentPlaylist.tracksForPlayback objectAtIndex:self.currentIndex];
-        self.trackLabel.text = self.currentTrack.name;
-        SPTPartialArtist *artist = (SPTPartialArtist *)[self.currentTrack.artists objectAtIndex:0];
-        self.artistLabel.text = artist.name;
     }];
     
 }
@@ -585,7 +542,7 @@
 #pragma mark - Track Player Delegates
 
 - (void)audioStreaming:(SPTAudioStreamingController *)audioStreaming didReceiveMessage:(NSString *)message {
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Message from Spotify"
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Spotify Message:"
                                                         message:message
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
@@ -593,25 +550,43 @@
     [alertView show];
 }
 
-- (void)audioStreaming:(SPTAudioStreamingController *)audioStreaming didFailToPlayTrack:(NSURL *)trackUri {
-    NSLog(@"failed to play track: %@", trackUri);
-}
-
-- (void) audioStreaming:(SPTAudioStreamingController *)audioStreaming didChangeToTrack:(NSDictionary *)trackMetadata {
-    //SPTAuth *auth = [SPTAuth defaultInstance];
-    
-    NSLog(@"track changed = %@", [trackMetadata valueForKey:SPTAudioStreamingMetadataTrackURI]);
-//    [SPTRequest requestItemAtURI:[trackMetadata valueForKey:SPTAudioStreamingMetadataTrackURI] withSession:auth.session callback:^(NSError *error, id object) {
-//        SPTTrack
-//    }];
-    [self updateInfo];
+-(void)audioStreaming:(SPTAudioStreamingController *)audioStreaming didStartPlayingTrack:(NSURL *)trackUri{
+    NSLog(@"started track");
+    NSLog(@"Track Index: %d", self.audioPlayer.currentTrackIndex);
+    self.currentIndex = self.audioPlayer.currentTrackIndex;
+    [SPTTrack trackWithURI:trackUri session:self.session callback:^(NSError *error, SPTTrack *track) {
+        self.currentTrack = track;
+        self.trackLabel.text = self.currentTrack.name;
+        SPTPartialArtist *artist = (SPTPartialArtist *)[self.currentTrack.artists objectAtIndex:0];
+        self.artistLabel.text = artist.name;
+        NSURL *coverArtURL = self.currentTrack.album.largestCover.imageURL;
+        
+        if(coverArtURL){
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                NSError *error = nil;
+                UIImage *image = nil;
+                NSData *imageData = [NSData dataWithContentsOfURL:coverArtURL options:0 error:&error];
+                
+                if (imageData != nil) {
+                    image = [UIImage imageWithData:imageData];
+                }
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self.coverArt.image = image;
+                    if (image == nil) {
+                        NSLog(@"Couldn't load cover image with error: %@", error);
+                        return;
+                    }
+                });
+            });
+        }
+        
+    }];
 }
 
 - (void)audioStreaming:(SPTAudioStreamingController *)audioStreaming didChangePlaybackStatus:(BOOL)isPlaying {
     NSLog(@"is playing = %d", isPlaying);
 }
-
-
 
 /*
 #pragma mark - Navigation

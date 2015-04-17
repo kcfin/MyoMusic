@@ -34,7 +34,9 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.profileImageView = [UIImageView new];
     self.currentPlayingIndex = -1;
-    
+    UIBarButtonItem *nowplaying = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(goToNowPlaying:)];
+    self.navigationItem.rightBarButtonItem = nowplaying;
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height/2, self.view.frame.size.width, self.view.frame.size.height/2) style:UITableViewStylePlain];
     self.tableView.contentInset = UIEdgeInsetsZero;
     
@@ -147,6 +149,9 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self.navigationItem.rightBarButtonItem setTitle:@"Player"];
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+    
     if(self.currentPlayingIndex != indexPath.row){
         self.currentPlayingIndex = indexPath.row;
         self.musicVC.session = self.user.session;
@@ -156,4 +161,7 @@
     [self.navigationController pushViewController:self.musicVC animated:YES];
 }
 
+-(void)goToNowPlaying:(id)sender{
+    [self.navigationController pushViewController:self.musicVC animated:YES];
+}
 @end
