@@ -130,4 +130,8 @@
     [[SpotifyUser user] handle:session];
 }
 
+- (void)authenticationViewControllerDidCancelLogin:(SPTAuthViewController *)authenticationViewController{
+    NSLog(@"*** Cancelled log in.");
+}
+
 @end

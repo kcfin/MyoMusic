@@ -42,6 +42,10 @@
 @property (nonatomic) NSTimer *volumeIncreaseTimer;
 @property (nonatomic) NSTimer *volumeDecreaseTimer;
 
+@property (nonatomic)float highY;
+@property (nonatomic)float lowY;
+@property (nonatomic)NSTimeInterval lastShuffleTime;
+
 
 @end
 
@@ -52,6 +56,7 @@
     [self setupMyoNotifications];
     UIBarButtonItem *myoButton = [[UIBarButtonItem alloc] initWithTitle:@"Connect" style:UIBarButtonItemStylePlain target:self action:@selector(connectMyo:)];
     self.navigationItem.rightBarButtonItem = myoButton;
+    self.lastShuffleTime = [[NSDate date] timeIntervalSince1970];
     
     self.isAdjustingVolume = NO;
     
@@ -186,6 +191,10 @@
                                                  name:TLMMyoDidReceiveOrientationEventNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didReceiveAccelerometerEvent:)
+                                                 name:TLMMyoDidReceiveAccelerometerEventNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didReceivePoseChange:)
                                                  name:TLMMyoDidReceivePoseChangedNotification
                                                object:nil];
@@ -227,13 +236,43 @@
     TLMOrientationEvent *orientationEvent = notification.userInfo[kTLMKeyOrientationEvent];
     TLMEulerAngles *angles = [TLMEulerAngles anglesWithQuaternion:orientationEvent.quaternion];
     int rotation = angles.roll.degrees;
-
+    
     if(self.isAdjustingVolume == YES) {
         NSLog(@"Received Orientation: %d", rotation);
-        self.myoStatus.text = @"Myo: Adjusting volume.";
+        self.myoStatus.text = @"Myo: Fist.";
         [self adjustVolumeWithMyo:rotation - self.latestNoFistRoll];
     } else {
         self.latestNoFistRoll = rotation;
+    }
+}
+
+-(void)didReceiveAccelerometerEvent:(NSNotification *)notification{
+    TLMPose *pose = notification.userInfo[kTLMKeyPose];
+    TLMAccelerometerEvent *accelerometerEvent = notification.userInfo[kTLMKeyAccelerometerEvent];
+    TLMVector3 vector = accelerometerEvent.vector;
+    if(self.isAdjustingVolume){
+        if (vector.y > self.highY) {
+            self.highY = vector.y;
+            self.lowY = vector.y;
+        }
+        if (vector.y < self.lowY) {
+            self.lowY = vector.y;
+        }
+        NSLog(@"high %f low %f", self.highY, self.lowY);
+        NSTimeInterval timeSinceLastShuffle = [[NSDate date] timeIntervalSince1970] - self.lastShuffleTime;
+        if ((self.highY - self.lowY > 1.5) && timeSinceLastShuffle > 2) {
+            self.lastShuffleTime = [[NSDate date] timeIntervalSince1970];
+            if (self.audioPlayer.shuffle) {
+                self.audioPlayer.shuffle = NO;
+                [self.shuffleButton setImage:[UIImage imageNamed:@"shuffleButton.png"] forState:UIControlStateNormal];
+            } else {
+                self.audioPlayer.shuffle = YES;
+                [self.shuffleButton setImage:[UIImage imageNamed:@"shuffleButtonPressed.png"] forState:UIControlStateNormal];
+            }
+            [pose.myo lock];
+            self.highY = -999;
+            self.lowY = -999;
+        }
     }
 }
 
@@ -319,6 +358,11 @@
             break;
     }
     
+    if(pose.type != TLMPoseTypeFist){
+        self.highY = -999;
+        self.lowY = -999;
+    }
+    
     if (pose.type == TLMPoseTypeUnknown || pose.type == TLMPoseTypeRest) {
         [pose.myo unlockWithType:TLMUnlockTypeTimed];
     } else {
@@ -349,9 +393,6 @@
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-100-[coverView]-15-[trackView(20)]-10-[artistView(20)]" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[playbackView(20)]-15-[playView(50)]-15-[volumeView(20)]-20-[myoStatusView(50)]-15-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
-    
-    
-    constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[myoStatusView(40)]-20-|" options:NSLayoutFormatAlignAllCenterX metrics:nil views:views]];
     
     constraints = [constraints arrayByAddingObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-50-[trackView]-50-|" options:0 metrics:nil views:views]];
     
@@ -583,6 +624,7 @@
     NSLog(@"started track");
     NSLog(@"Track Index: %d", self.audioPlayer.currentTrackIndex);
     self.currentIndex = self.audioPlayer.currentTrackIndex;
+    [self.playButton setImage:self.pauseImage forState:UIControlStateNormal];
     [SPTTrack trackWithURI:trackUri session:self.session callback:^(NSError *error, SPTTrack *track) {
         self.currentTrack = track;
         self.trackLabel.text = self.currentTrack.name;

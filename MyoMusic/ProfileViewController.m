@@ -184,6 +184,7 @@
     [self.profileImageView setImage:[UIImage imageNamed:@"man.png"]];
     self.nameLabel.text = @"";
     self.currentPlayingIndex = -1;
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
     [self.tableView reloadData];
     if (self.musicVC.audioPlayer) {
         [self.musicVC.audioPlayer logout:^(NSError *error) {
